@@ -5,9 +5,12 @@ export const CREATE_USER_MUTATION = gql`
     createUser(
       data: { username: $username, email: $email, password: $password }
     ) {
-      id
-      username
-      email
+      token
+      user {
+        id
+        username
+        email
+      }
     }
   }
 `;

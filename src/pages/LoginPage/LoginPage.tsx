@@ -1,13 +1,40 @@
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useMutation } from '@apollo/client';
 import { Form, FormInput } from '../../components/Form';
+import { useNavigate } from 'react-router-dom';
+import { LOGIN_MUTATION } from './mutations';
+import { useAppData } from '../../hooks/useAppData';
+import { UserModelInterface } from '../../types/interfaces';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const formHook = useForm({
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+    reValidateMode: 'onChange',
+  });
+  const navigate = useNavigate();
+  const [loginUser, { loading }] = useMutation(LOGIN_MUTATION);
+  const { setCurrentUser } = useAppData();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ username, password });
+    const values = formHook.getValues();
+    if (!values.username || !values.password) {
+      alert('Please fill out all fields');
+      return;
+    }
+    const response = (await loginUser({
+      variables: values,
+    })) as {
+      data: {
+        login: UserModelInterface;
+      };
+    };
+
+    setCurrentUser(response.data.login);
+    navigate('/dashboard');
   };
 
   const inputs: FormInput[] = [
@@ -17,9 +44,9 @@ const LoginPage = () => {
       placeholder: 'Enter your username',
       required: true,
       label: 'Username',
-      value: username,
+      value: formHook.getValues('username'),
       onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setUsername(e.target.value),
+        formHook.setValue('username', e.target.value),
     },
     {
       name: 'password',
@@ -27,9 +54,9 @@ const LoginPage = () => {
       placeholder: 'Enter your password',
       required: true,
       label: 'Password',
-      value: password,
+      value: formHook.getValues('password'),
       onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setPassword(e.target.value),
+        formHook.setValue('password', e.target.value),
     },
   ];
 
