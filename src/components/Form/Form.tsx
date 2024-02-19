@@ -26,9 +26,15 @@ export interface FormProps {
   inputs: FormInput[];
   submitText: string;
   onSubmit: (e: React.FormEvent) => void;
+  isLoading?: boolean;
 }
 
-const Form: React.FC<FormProps> = ({ inputs, submitText, onSubmit }) => {
+const Form: React.FC<FormProps> = ({
+  inputs,
+  submitText,
+  onSubmit,
+  isLoading,
+}) => {
   const renderInput = (input: FormInput, index: number) => {
     switch (input.type) {
       case 'select':
@@ -83,12 +89,14 @@ const Form: React.FC<FormProps> = ({ inputs, submitText, onSubmit }) => {
 
   return (
     <form onSubmit={onSubmit}>
-      <Box display="flex" flexDirection="column" gap={2}>
-        {inputs.map(renderInput)}
-        <Button type="submit" variant="contained" color="primary">
-          {submitText}
-        </Button>
-      </Box>
+      <fieldset disabled={isLoading}>
+        <Box display="flex" flexDirection="column" gap={2}>
+          {inputs.map(renderInput)}
+          <Button type="submit" variant="contained" color="primary">
+            {isLoading ? 'Loading...' : submitText}
+          </Button>
+        </Box>
+      </fieldset>
     </form>
   );
 };
