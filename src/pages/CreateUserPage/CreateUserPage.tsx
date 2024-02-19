@@ -1,14 +1,47 @@
 import { useState } from 'react';
 import { Form, FormInput } from '../../components/Form';
+import { useMutation } from '@apollo/client';
+import { CREATE_USER_MUTATION } from './mutations';
+import { useForm } from 'react-hook-form';
+import { useAppData } from '../../hooks/useAppData';
+import { UserModelInterface } from '../../types/interfaces';
+import { useNavigate } from 'react-router-dom';
 
 const CreateUserPage = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { getValues, setValue } = useForm({
+    defaultValues: {
+      username: '',
+      email: '',
+      password: '',
+    },
+    reValidateMode: 'onChange',
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [createUser, { loading }] = useMutation(CREATE_USER_MUTATION);
+  const { setCurrentUser } = useAppData();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ username, email, password });
+    // every value is required, lets check with an array
+    const valuesExist = Object.values(getValues()).every((value) => value);
+    const values = getValues();
+
+    if (!valuesExist) {
+      alert('Please fill out all fields');
+      return;
+    }
+
+    const response = (await createUser({
+      variables: values,
+    })) as {
+      data: {
+        createUser: UserModelInterface;
+      };
+    };
+
+    setCurrentUser(response.data.createUser);
+    navigate('/dashboard');
   };
 
   const inputs: FormInput[] = [
@@ -18,9 +51,9 @@ const CreateUserPage = () => {
       placeholder: 'Enter your username',
       required: true,
       label: 'Username',
-      value: username,
+      value: getValues('username'),
       onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setUsername(e.target.value),
+        setValue('username', e.target.value),
     },
     {
       name: 'email',
@@ -28,9 +61,9 @@ const CreateUserPage = () => {
       placeholder: 'Enter your email',
       required: true,
       label: 'Email',
-      value: email,
+      value: getValues('email'),
       onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setEmail(e.target.value),
+        setValue('email', e.target.value),
     },
     {
       name: 'password',
@@ -38,9 +71,9 @@ const CreateUserPage = () => {
       placeholder: 'Enter your password',
       required: true,
       label: 'Password',
-      value: password,
+      value: getValues('password'),
       onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setPassword(e.target.value),
+        setValue('password', e.target.value),
     },
   ];
 
