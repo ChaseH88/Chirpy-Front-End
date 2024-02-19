@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { CreateUserPage } from './pages/CreateUserPage';
 import { LoginPage } from './pages/LoginPage';
 import { ReactQuery } from './providers/ReactQuery';
-import { DashboardPage } from './pages/DashboardPage/Dashboard';
+import { DashboardPage } from './pages/DashboardPage';
 
 const App = (): JSX.Element => (
   <div className="App">
