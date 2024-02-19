@@ -1,13 +1,12 @@
-import { useState } from 'react';
 import { Form, FormInput } from '../../components/Form';
 import { useMutation } from '@apollo/client';
 import { CREATE_USER_MUTATION } from './mutations';
 import { useForm } from 'react-hook-form';
-import { useAppData } from '../../hooks/useAppData';
 import { UserModelInterface } from '../../types/interfaces';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 const CreateUserPage = () => {
+  const { login } = useAuth();
   const { getValues, setValue } = useForm({
     defaultValues: {
       username: '',
@@ -18,8 +17,6 @@ const CreateUserPage = () => {
   });
 
   const [createUser, { loading }] = useMutation(CREATE_USER_MUTATION);
-  const { setCurrentUser } = useAppData();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,12 +33,13 @@ const CreateUserPage = () => {
       variables: values,
     })) as {
       data: {
-        createUser: UserModelInterface;
+        createUser: {
+          token: string;
+          user: UserModelInterface;
+        };
       };
     };
-
-    setCurrentUser(response.data.createUser);
-    navigate('/dashboard');
+    login(response.data.createUser.token);
   };
 
   const inputs: FormInput[] = [
@@ -78,7 +76,12 @@ const CreateUserPage = () => {
   ];
 
   return (
-    <Form inputs={inputs} submitText="Create User" onSubmit={handleSubmit} />
+    <Form
+      inputs={inputs}
+      submitText="Create User"
+      onSubmit={handleSubmit}
+      isLoading={loading}
+    />
   );
 };
 

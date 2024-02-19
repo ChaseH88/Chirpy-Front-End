@@ -3,8 +3,8 @@ import { useMutation } from '@apollo/client';
 import { Form, FormInput } from '../../components/Form';
 import { useNavigate } from 'react-router-dom';
 import { LOGIN_MUTATION } from './mutations';
-import { useAppData } from '../../hooks/useAppData';
 import { UserModelInterface } from '../../types/interfaces';
+import { useAuth } from '../../hooks/useAuth';
 
 const LoginPage = () => {
   const formHook = useForm({
@@ -16,7 +16,7 @@ const LoginPage = () => {
   });
   const navigate = useNavigate();
   const [loginUser, { loading }] = useMutation(LOGIN_MUTATION);
-  const { setCurrentUser } = useAppData();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,16 +25,18 @@ const LoginPage = () => {
       alert('Please fill out all fields');
       return;
     }
-    const response = (await loginUser({
+    const res = (await loginUser({
       variables: values,
     })) as {
       data: {
-        login: UserModelInterface;
+        login: {
+          token: string;
+          user: UserModelInterface;
+        };
       };
     };
 
-    setCurrentUser(response.data.login);
-    navigate('/dashboard');
+    login(res.data.login.token);
   };
 
   const inputs: FormInput[] = [
