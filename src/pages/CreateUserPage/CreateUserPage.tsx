@@ -4,6 +4,9 @@ import { CREATE_USER_MUTATION } from './mutations';
 import { useForm } from 'react-hook-form';
 import { UserModelInterface } from '../../types/interfaces';
 import { useAuth } from '../../hooks/useAuth';
+import { HomeLayout } from '../../components/HomeLayout';
+import { Box, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const CreateUserPage = () => {
   const { login } = useAuth();
@@ -15,6 +18,7 @@ const CreateUserPage = () => {
     },
     reValidateMode: 'onChange',
   });
+  const navigate = useNavigate();
 
   const [createUser, { loading }] = useMutation(CREATE_USER_MUTATION);
 
@@ -76,11 +80,28 @@ const CreateUserPage = () => {
   ];
 
   return (
-    <Form
-      inputs={inputs}
-      submitText="Create User"
-      onSubmit={handleSubmit}
-      isLoading={loading}
+    <HomeLayout
+      FormComponent={() => (
+        <Form
+          inputs={inputs}
+          submitText="Create User"
+          onSubmit={handleSubmit}
+          isLoading={loading}
+        />
+      )}
+      MenuComponent={() => (
+        <Box display="flex" justifyContent="center" mt={1}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="small"
+            onClick={() => navigate('/login')}
+          >
+            Login
+          </Button>
+        </Box>
+      )}
+      welcomeMessage="Create an account"
     />
   );
 };

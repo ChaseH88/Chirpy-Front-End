@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { LOGIN_MUTATION } from './mutations';
 import { UserModelInterface } from '../../types/interfaces';
 import { useAuth } from '../../hooks/useAuth';
+import { HomeLayout } from '../../components/HomeLayout';
+import { Box, Button } from '@mui/material';
 
 const LoginPage = () => {
   const formHook = useForm({
@@ -62,7 +64,26 @@ const LoginPage = () => {
     },
   ];
 
-  return <Form inputs={inputs} submitText="Login" onSubmit={handleSubmit} />;
+  return (
+    <HomeLayout
+      FormComponent={() => (
+        <Form inputs={inputs} onSubmit={handleSubmit} submitText="Login" />
+      )}
+      MenuComponent={() => (
+        <Box display="flex" justifyContent="center" mt={1}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="small"
+            onClick={() => navigate('/create-user')}
+          >
+            Create an account
+          </Button>
+        </Box>
+      )}
+      welcomeMessage="Welcome back!"
+    />
+  );
 };
 
 export { LoginPage };
