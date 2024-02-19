@@ -3,17 +3,20 @@ import { CreateUserPage } from './pages/CreateUserPage';
 import { LoginPage } from './pages/LoginPage';
 import { ReactQuery } from './providers/ReactQuery';
 import { DashboardPage } from './pages/DashboardPage';
+import { AppDataProvider } from './providers/AppData';
 
 const App = (): JSX.Element => (
   <div className="App">
     <ReactQuery>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/create-user" element={<CreateUserPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/login" element={<LoginPage />} />
-        </Routes>
-      </BrowserRouter>
+      <AppDataProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/create-user" element={<CreateUserPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/login" element={<LoginPage />} />
+          </Routes>
+        </BrowserRouter>
+      </AppDataProvider>
     </ReactQuery>
   </div>
 );
