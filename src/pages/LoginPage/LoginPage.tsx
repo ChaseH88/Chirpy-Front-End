@@ -17,7 +17,7 @@ const LoginPage = () => {
     reValidateMode: 'onChange',
   });
   const navigate = useNavigate();
-  const [loginUser, { loading }] = useMutation(LOGIN_MUTATION);
+  const [loginUser, { loading, error }] = useMutation(LOGIN_MUTATION);
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {

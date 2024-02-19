@@ -8,6 +8,7 @@ export interface UserModelInterface {
 }
 
 export interface PostModelInterface {
+  id: string;
   postedBy: UserModelInterface;
   content: string;
   likes: UserModelInterface[];
