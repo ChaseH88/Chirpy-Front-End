@@ -1,20 +1,14 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { CreateUserPage } from './pages/CreateUserPage';
-import { LoginPage } from './pages/LoginPage';
+import { BrowserRouter } from 'react-router-dom';
 import { ReactQuery } from './providers/ReactQuery';
-import { DashboardPage } from './pages/DashboardPage';
 import { AppDataProvider } from './providers/AppData';
+import { Routes as AppRoutes } from './components/Routes';
 
 const App = (): JSX.Element => (
   <div className="App">
     <ReactQuery>
       <AppDataProvider>
         <BrowserRouter>
-          <Routes>
-            <Route path="/create-user" element={<CreateUserPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/login" element={<LoginPage />} />
-          </Routes>
+          <AppRoutes />
         </BrowserRouter>
       </AppDataProvider>
     </ReactQuery>

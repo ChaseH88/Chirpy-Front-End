@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useReducer } from 'react';
 import { UserModelInterface } from '../../types/interfaces';
 
 export interface AppDataContext {
