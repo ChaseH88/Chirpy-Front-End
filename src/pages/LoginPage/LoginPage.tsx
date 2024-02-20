@@ -1,20 +1,20 @@
-import { useForm } from 'react-hook-form';
-import { useMutation } from '@apollo/client';
-import { Form, FormInput } from '../../components/Form';
-import { useNavigate } from 'react-router-dom';
-import { LOGIN_MUTATION } from './mutations';
-import { UserModelInterface } from '../../types/interfaces';
-import { useAuth } from '../../hooks/useAuth';
-import { HomeLayout } from '../../components/HomeLayout';
-import { Box, Button } from '@mui/material';
+import { useForm } from "react-hook-form";
+import { useMutation } from "@apollo/client";
+import { Form, FormInput } from "../../components/Form";
+import { useNavigate } from "react-router-dom";
+import { LOGIN_MUTATION } from "./mutations";
+import { UserModelInterface } from "../../types/interfaces";
+import { useAuth } from "../../hooks/useAuth";
+import { HomeLayout } from "../../components/HomeLayout";
+import { Box, Button } from "@mui/material";
 
 const LoginPage = () => {
   const formHook = useForm({
     defaultValues: {
-      username: '',
-      password: '',
+      username: "",
+      password: "",
     },
-    reValidateMode: 'onChange',
+    reValidateMode: "onChange",
   });
   const navigate = useNavigate();
   const [loginUser, { loading, error }] = useMutation(LOGIN_MUTATION);
@@ -24,7 +24,7 @@ const LoginPage = () => {
     e.preventDefault();
     const values = formHook.getValues();
     if (!values.username || !values.password) {
-      alert('Please fill out all fields');
+      alert("Please fill out all fields");
       return;
     }
     const res = (await loginUser({
@@ -43,31 +43,30 @@ const LoginPage = () => {
 
   const inputs: FormInput[] = [
     {
-      name: 'username',
-      type: 'text',
-      placeholder: 'Enter your username',
+      name: "username",
+      type: "text",
+      placeholder: "Enter your username",
       required: true,
-      label: 'Username',
-      value: formHook.getValues('username'),
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        formHook.setValue('username', e.target.value),
+      label: "Username",
     },
     {
-      name: 'password',
-      type: 'password',
-      placeholder: 'Enter your password',
+      name: "password",
+      type: "password",
+      placeholder: "Enter your password",
       required: true,
-      label: 'Password',
-      value: formHook.getValues('password'),
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        formHook.setValue('password', e.target.value),
+      label: "Password",
     },
   ];
 
   return (
     <HomeLayout
       FormComponent={() => (
-        <Form inputs={inputs} onSubmit={handleSubmit} submitText="Login" />
+        <Form
+          inputs={inputs}
+          onSubmit={handleSubmit}
+          submitText="Login"
+          formHook={formHook}
+        />
       )}
       MenuComponent={() => (
         <Box display="flex" justifyContent="center" mt={1}>
@@ -75,7 +74,7 @@ const LoginPage = () => {
             variant="outlined"
             color="secondary"
             size="small"
-            onClick={() => navigate('/create-user')}
+            onClick={() => navigate("/create-user")}
           >
             Create an account
           </Button>

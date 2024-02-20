@@ -1,22 +1,22 @@
-import { Form, FormInput } from '../../components/Form';
-import { useMutation } from '@apollo/client';
-import { CREATE_USER_MUTATION } from './mutations';
-import { useForm } from 'react-hook-form';
-import { UserModelInterface } from '../../types/interfaces';
-import { useAuth } from '../../hooks/useAuth';
-import { HomeLayout } from '../../components/HomeLayout';
-import { Box, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Form, FormInput } from "../../components/Form";
+import { useMutation } from "@apollo/client";
+import { CREATE_USER_MUTATION } from "./mutations";
+import { useForm } from "react-hook-form";
+import { UserModelInterface } from "../../types/interfaces";
+import { useAuth } from "../../hooks/useAuth";
+import { HomeLayout } from "../../components/HomeLayout";
+import { Box, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const CreateUserPage = () => {
   const { login } = useAuth();
-  const { getValues, setValue } = useForm({
+  const formHook = useForm({
     defaultValues: {
-      username: '',
-      email: '',
-      password: '',
+      username: "",
+      email: "",
+      password: "",
     },
-    reValidateMode: 'onChange',
+    reValidateMode: "onChange",
   });
   const navigate = useNavigate();
 
@@ -25,11 +25,13 @@ const CreateUserPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // every value is required, lets check with an array
-    const valuesExist = Object.values(getValues()).every((value) => value);
-    const values = getValues();
+    const valuesExist = Object.values(formHook.getValues()).every(
+      (value) => value
+    );
+    const values = formHook.getValues();
 
     if (!valuesExist) {
-      alert('Please fill out all fields');
+      alert("Please fill out all fields");
       return;
     }
 
@@ -48,34 +50,25 @@ const CreateUserPage = () => {
 
   const inputs: FormInput[] = [
     {
-      name: 'username',
-      type: 'text',
-      placeholder: 'Enter your username',
+      name: "username",
+      type: "text",
+      placeholder: "Enter your username",
       required: true,
-      label: 'Username',
-      value: getValues('username'),
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setValue('username', e.target.value),
+      label: "Username",
     },
     {
-      name: 'email',
-      type: 'email',
-      placeholder: 'Enter your email',
+      name: "email",
+      type: "email",
+      placeholder: "Enter your email",
       required: true,
-      label: 'Email',
-      value: getValues('email'),
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setValue('email', e.target.value),
+      label: "Email",
     },
     {
-      name: 'password',
-      type: 'password',
-      placeholder: 'Enter your password',
+      name: "password",
+      type: "password",
+      placeholder: "Enter your password",
       required: true,
-      label: 'Password',
-      value: getValues('password'),
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setValue('password', e.target.value),
+      label: "Password",
     },
   ];
 
@@ -87,6 +80,7 @@ const CreateUserPage = () => {
           submitText="Create User"
           onSubmit={handleSubmit}
           isLoading={loading}
+          formHook={formHook}
         />
       )}
       MenuComponent={() => (
@@ -95,7 +89,7 @@ const CreateUserPage = () => {
             variant="outlined"
             color="secondary"
             size="small"
-            onClick={() => navigate('/login')}
+            onClick={() => navigate("/login")}
           >
             Login
           </Button>

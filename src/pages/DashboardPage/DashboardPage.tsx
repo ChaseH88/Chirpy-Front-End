@@ -1,13 +1,13 @@
-import { useMutation, useQuery } from '@apollo/client';
-import { GET_POSTS } from './queries';
-import { useAppData } from '../../hooks/useAppData';
-import { useAuth } from '../../hooks/useAuth';
-import { Posts } from '../../components/Posts/Posts';
-import { CREATE_POST_MUTATION } from './mutations';
-import { Form, FormInput } from '../../components/Form';
-import { useForm } from 'react-hook-form';
-import { DashboardLayout } from '../../components/DashboardLayout';
-import { Box } from '@mui/material';
+import { useMutation, useQuery } from "@apollo/client";
+import { GET_POSTS } from "./queries";
+import { useAppData } from "../../hooks/useAppData";
+import { useAuth } from "../../hooks/useAuth";
+import { Posts } from "../../components/Posts/Posts";
+import { CREATE_POST_MUTATION } from "./mutations";
+import { Form, FormInput } from "../../components/Form";
+import { useForm } from "react-hook-form";
+import { DashboardLayout } from "../../components/DashboardLayout";
+import { Box } from "@mui/material";
 
 const DashboardPage = () => {
   const { loading: getPostLoading, error, data } = useQuery(GET_POSTS);
@@ -15,18 +15,18 @@ const DashboardPage = () => {
     useMutation(CREATE_POST_MUTATION);
   const { currentUser } = useAppData();
   const { logout } = useAuth();
-  const { getValues, setValue } = useForm({
+  const formHook = useForm({
     defaultValues: {
-      content: '',
+      content: "",
     },
-    reValidateMode: 'onChange',
+    reValidateMode: "onChange",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const values = getValues();
+    const values = formHook.getValues();
     if (!values.content) {
-      alert('Please fill out all fields');
+      alert("Please fill out all fields");
       return;
     }
     await createPost({
@@ -38,19 +38,15 @@ const DashboardPage = () => {
       },
       refetchQueries: [{ query: GET_POSTS }],
     });
-    setValue('content', '');
   };
 
   const inputs: FormInput[] = [
     {
-      name: 'content',
-      type: 'text',
-      placeholder: 'Enter your post',
+      name: "content",
+      type: "text",
+      placeholder: "Enter your post",
       required: true,
-      label: 'Post',
-      value: getValues('content'),
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setValue('content', e.target.value),
+      label: "Post",
     },
   ];
 
@@ -59,8 +55,17 @@ const DashboardPage = () => {
       <DashboardLayout
         PostsComponent={() => (
           <Box>
-            <Form inputs={inputs} onSubmit={handleSubmit} submitText="Login" />
-            <Posts posts={data?.allPosts} headingText="All Posts" />
+            <Box mb={2}>
+              <Form
+                inputs={inputs}
+                onSubmit={handleSubmit}
+                submitText="Post"
+                formHook={formHook}
+              />
+            </Box>
+            <Box>
+              <Posts posts={data?.allPosts} headingText="All Posts" />
+            </Box>
           </Box>
         )}
         AvatarComponent={() => (

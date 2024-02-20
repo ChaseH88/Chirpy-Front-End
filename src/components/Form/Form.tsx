@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   TextField,
   Button,
@@ -7,9 +7,10 @@ import {
   InputLabel,
   FormControl,
   Box,
-} from '@mui/material';
+} from "@mui/material";
+import { UseFormReturn } from "react-hook-form";
 
-type FormTypes = 'text' | 'email' | 'password' | 'textarea' | 'select';
+type FormTypes = "text" | "email" | "password" | "textarea" | "select";
 
 export interface FormInput {
   name: string;
@@ -27,6 +28,7 @@ export interface FormProps {
   submitText: string;
   onSubmit: (e: React.FormEvent) => void;
   isLoading?: boolean;
+  formHook: UseFormReturn<any>;
 }
 
 const Form: React.FC<FormProps> = ({
@@ -34,17 +36,21 @@ const Form: React.FC<FormProps> = ({
   submitText,
   onSubmit,
   isLoading,
+  formHook: { setValue, getValues },
 }) => {
   const renderInput = (input: FormInput, index: number) => {
     switch (input.type) {
-      case 'select':
+      case "select":
         return (
           <FormControl fullWidth key={index} required={input.required}>
             <InputLabel>{input.label}</InputLabel>
             <Select
               name={input.name}
-              value={input.value}
-              onChange={input.onChange as any}
+              value={input.value || getValues(input.name)}
+              onChange={(e) => {
+                setValue(input.name, e.target.value);
+                input.onChange?.(e as any);
+              }}
               label={input.label}
             >
               {input.options?.map((option, idx) => (
@@ -55,7 +61,7 @@ const Form: React.FC<FormProps> = ({
             </Select>
           </FormControl>
         );
-      case 'textarea':
+      case "textarea":
         return (
           <TextField
             key={index}
@@ -67,7 +73,10 @@ const Form: React.FC<FormProps> = ({
             required={input.required}
             label={input.label}
             defaultValue={input.value}
-            onChange={input.onChange}
+            onChange={(e) => {
+              setValue(input.name, e.target.value);
+              input.onChange?.(e as any);
+            }}
           />
         );
       default:
@@ -81,7 +90,10 @@ const Form: React.FC<FormProps> = ({
             required={input.required}
             label={input.label}
             defaultValue={input.value}
-            onChange={input.onChange}
+            onChange={(e) => {
+              setValue(input.name, e.target.value);
+              input.onChange?.(e as any);
+            }}
           />
         );
     }
@@ -89,11 +101,11 @@ const Form: React.FC<FormProps> = ({
 
   return (
     <form onSubmit={onSubmit}>
-      <fieldset disabled={isLoading}>
+      <fieldset disabled={isLoading} style={{ border: "none" }}>
         <Box display="flex" flexDirection="column" gap={2}>
           {inputs.map(renderInput)}
           <Button type="submit" variant="contained" color="primary">
-            {isLoading ? 'Loading...' : submitText}
+            {isLoading ? "Loading..." : submitText}
           </Button>
         </Box>
       </fieldset>
