@@ -1,5 +1,6 @@
-import { Box, Paper, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { PostModelInterface } from '../../types/interfaces';
+import { Post } from './Post';
 
 interface PostsProps {
   posts: PostModelInterface[];
@@ -24,14 +25,5 @@ export const Posts = ({ posts, headingText }: PostsProps) => {
         )}
       </Box>
     </Stack>
-  );
-};
-
-export const Post = ({ post }: { post: PostModelInterface }) => {
-  return (
-    <Paper>
-      <h3>{post.content}</h3>
-      <p>{post.postedBy.username}</p>
-    </Paper>
   );
 };

@@ -14,12 +14,15 @@ export interface PostModelInterface {
   content: string;
   likes: UserModelInterface[];
   dislikes: UserModelInterface[];
-  comments: {
-    user: UserModelInterface;
-    comment: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
+  comments: CommentInterface[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CommentInterface {
+  id: string;
+  user: UserModelInterface;
+  comment: string;
   createdAt: Date;
   updatedAt: Date;
 }
