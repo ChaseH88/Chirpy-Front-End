@@ -13,6 +13,7 @@ export const GET_POSTS = gql`
         id
         comment
         user {
+          id
           username
         }
         createdAt
@@ -25,6 +26,7 @@ export const GET_POSTS = gql`
         id
         username
       }
+      createdAt
     }
   }
 `;

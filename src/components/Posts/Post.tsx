@@ -67,15 +67,21 @@ export const Post = ({ post }: { post: PostModelInterface }) => {
         {/* <Typography variant="body2">{post.createdAt}</Typography> */}
       </Box>
       <Button onClick={toggleCommentBox}>Comment</Button>
-      {commentOn && (
+      {commentOn ? (
         <Form inputs={inputs} onSubmit={handleSubmit} submitText="Comment" />
+      ) : (
+        <>
+          <Typography variant="h6">{`${post.comments.length} Comment${
+            post.comments.length > 1 ? 's' : ''
+          }`}</Typography>
+          {post?.comments?.map((comment: CommentInterface) => (
+            <Box key={comment.id} className="comment">
+              <Typography variant="body1">{comment.comment}</Typography>
+              <Typography variant="body2">{comment.user.username}</Typography>
+            </Box>
+          ))}
+        </>
       )}
-      {post?.comments?.map((comment: CommentInterface) => (
-        <Box key={comment.id} className="comment">
-          <Typography variant="body1">{comment.comment}</Typography>
-          <Typography variant="body2">{comment.user.username}</Typography>
-        </Box>
-      ))}
     </Paper>
   );
 };

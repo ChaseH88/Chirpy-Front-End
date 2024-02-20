@@ -6,6 +6,8 @@ import { Posts } from '../../components/Posts/Posts';
 import { CREATE_POST_MUTATION } from './mutations';
 import { Form, FormInput } from '../../components/Form';
 import { useForm } from 'react-hook-form';
+import { DashboardLayout } from '../../components/DashboardLayout';
+import { Box } from '@mui/material';
 
 const DashboardPage = () => {
   const { loading: getPostLoading, error, data } = useQuery(GET_POSTS);
@@ -54,12 +56,21 @@ const DashboardPage = () => {
 
   return (
     <div>
+      <DashboardLayout
+        PostsComponent={() => (
+          <Box>
+            <Form inputs={inputs} onSubmit={handleSubmit} submitText="Login" />
+            <Posts posts={data?.allPosts} headingText="All Posts" />
+          </Box>
+        )}
+        AvatarComponent={() => (
+          <div>
+            <button onClick={logout}>Logout</button>
+          </div>
+        )}
+        TrendingComponent={() => <div>Trending</div>}
+      />
       <h1>Dashboard</h1>
-      <h3>{`Welcome ${currentUser!.username}`}</h3>
-      <p>Welcome to the dashboard</p>
-      <button onClick={logout}>Logout</button>
-      <Form inputs={inputs} onSubmit={handleSubmit} submitText="Login" />
-      <Posts posts={data?.allPosts} headingText="All Posts" />
     </div>
   );
 };
