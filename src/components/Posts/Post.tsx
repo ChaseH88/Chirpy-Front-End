@@ -7,6 +7,8 @@ import { CREATE_POST_COMMENT_MUTATION } from "./mutations";
 import { useAppData } from "../../hooks/useAppData";
 import { useState } from "react";
 import { GET_POSTS } from "../../pages/DashboardPage/queries";
+import { PostContainer } from "./styled";
+import moment from "moment";
 
 export const Post = ({ post }: { post: PostModelInterface }) => {
   const [commentOn, setCommentOn] = useState(false);
@@ -54,15 +56,47 @@ export const Post = ({ post }: { post: PostModelInterface }) => {
   ];
 
   return (
-    <Paper>
-      <Box className="content">
+    <PostContainer>
+      <Box className="content" p={2}>
         <Typography variant="body1">{post.content}</Typography>
       </Box>
-      <Box className="postedBy">
-        <Typography variant="body2">{post.postedBy.username}</Typography> -{" "}
-        {/* <Typography variant="body2">{post.createdAt}</Typography> */}
+      <Box className="postedBy" display="flex" justifyContent="flex-end" p={2}>
+        <Typography
+          variant="body2"
+          fontStyle={"italic"}
+          fontWeight={700}
+          mr={1}
+        >
+          {post.postedBy.username}
+        </Typography>{" "}
+        -
+        <Typography variant="body2" ml={1}>
+          {moment(post.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
+        </Typography>
       </Box>
-      <Button onClick={toggleCommentBox}>Comment</Button>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        borderTop={1}
+        borderColor={"primary.main"}
+        p={2}
+        mb={2}
+      >
+        <Typography mb={1} fontSize={14} variant="h6">
+          {`${post.comments.length} Comment${
+            post.comments.length > 1 ? "s" : ""
+          }`}
+        </Typography>
+        <Button
+          size="small"
+          variant="contained"
+          color="primary"
+          onClick={toggleCommentBox}
+        >
+          {commentOn ? "Cancel" : "Comment"}
+        </Button>
+      </Box>
       {commentOn ? (
         <Form
           inputs={inputs}
@@ -72,17 +106,51 @@ export const Post = ({ post }: { post: PostModelInterface }) => {
         />
       ) : (
         <>
-          <Typography variant="h6">{`${post.comments.length} Comment${
-            post.comments.length > 1 ? "s" : ""
-          }`}</Typography>
           {post?.comments?.map((comment: CommentInterface) => (
-            <Box key={comment.id} className="comment">
-              <Typography variant="body1">{comment.comment}</Typography>
-              <Typography variant="body2">{comment.user.username}</Typography>
+            <Box
+              key={comment.id}
+              className="comment"
+              mb={2}
+              mx={2}
+              p={2}
+              borderBottom={1}
+              borderColor={"primary.main"}
+              bgcolor={"#f3f3f3"}
+              borderRadius={3}
+            >
+              <Box>
+                <Typography variant="body1">{comment.comment}</Typography>
+              </Box>
+              <Box
+                display={"flex"}
+                justifyContent={"flex-start"}
+                mt={1}
+                alignItems={"center"}
+              >
+                <Typography
+                  variant="body2"
+                  fontSize={12}
+                  mr={0.5}
+                  fontWeight={700}
+                  fontStyle={"italic"}
+                >
+                  {`${comment.user.username} -`}
+                </Typography>
+                <Typography
+                  fontSize={12}
+                  variant="body2"
+                  fontStyle={"italic"}
+                  title={moment(comment.createdAt).format(
+                    "MMMM Do YYYY, h:mm:ss a"
+                  )}
+                >
+                  {moment(comment.createdAt).fromNow()}
+                </Typography>
+              </Box>
             </Box>
           ))}
         </>
       )}
-    </Paper>
+    </PostContainer>
   );
 };

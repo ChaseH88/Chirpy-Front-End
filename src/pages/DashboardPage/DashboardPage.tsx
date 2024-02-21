@@ -51,32 +51,36 @@ const DashboardPage = () => {
   ];
 
   return (
-    <div>
-      <DashboardLayout
-        PostsComponent={() => (
-          <Box>
-            <Box mb={2}>
-              <Form
-                inputs={inputs}
-                onSubmit={handleSubmit}
-                submitText="Post"
-                formHook={formHook}
-              />
-            </Box>
-            <Box>
-              <Posts posts={data?.allPosts} headingText="All Posts" />
-            </Box>
+    <DashboardLayout
+      PostsComponent={() => (
+        <Box>
+          <Box mb={5} borderBottom={1} borderColor="primary.main" pb={2}>
+            <Form
+              inputs={inputs}
+              onSubmit={handleSubmit}
+              submitText="Post"
+              formHook={formHook}
+              buttonPosition="right"
+            />
           </Box>
-        )}
-        AvatarComponent={() => (
-          <div>
-            <button onClick={logout}>Logout</button>
-          </div>
-        )}
-        TrendingComponent={() => <div>Trending</div>}
-      />
-      <h1>Dashboard</h1>
-    </div>
+          <Box
+            border={1}
+            borderColor="primary.main"
+            borderTop={0}
+            px={4}
+            py={2}
+          >
+            <Posts posts={data?.allPosts} />
+          </Box>
+        </Box>
+      )}
+      AvatarComponent={() => (
+        <div>
+          <button onClick={logout}>Logout</button>
+        </div>
+      )}
+      TrendingComponent={() => <div>Trending</div>}
+    />
   );
 };
 

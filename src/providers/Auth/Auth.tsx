@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export interface AuthContext {
   isLoggedIn: boolean;
@@ -21,30 +21,33 @@ const AuthProvider = ({
   const location = useLocation();
   const navigate = useNavigate();
   const setToken = useCallback(
-    (token: string) => localStorage.setItem('token', token),
+    (token: string) => localStorage.setItem("token", token),
     []
   );
-  const getToken = useCallback(() => localStorage.getItem('token'), []);
-  const removeToken = useCallback(() => localStorage.removeItem('token'), []);
+  const getToken = useCallback(() => localStorage.getItem("token"), []);
+  const removeToken = useCallback(() => localStorage.removeItem("token"), []);
 
   useEffect(() => {
     const token = getToken();
     if (token) {
       setLoggedIn(true);
     }
-  }, [location]);
+  }, [location, getToken]);
 
-  const login = useCallback((_token: string): void => {
-    setToken(_token);
-    setLoggedIn(true);
-    navigate('/dashboard');
-  }, []);
+  const login = useCallback(
+    (_token: string): void => {
+      setToken(_token);
+      setLoggedIn(true);
+      navigate("/dashboard");
+    },
+    [navigate, setToken]
+  );
 
   const logout = useCallback((): void => {
     removeToken();
     setLoggedIn(false);
-    navigate('/login');
-  }, []);
+    navigate("/login");
+  }, [navigate, removeToken]);
 
   return (
     <StateContext.Provider

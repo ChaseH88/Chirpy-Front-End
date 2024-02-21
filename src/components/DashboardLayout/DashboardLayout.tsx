@@ -1,5 +1,5 @@
-import { Box, Typography } from '@mui/material';
-import { Container } from './styled';
+import { Box, Typography } from "@mui/material";
+import { Container } from "./styled";
 
 interface DashboardLayoutProps {
   PostsComponent: React.ComponentType;
@@ -15,28 +15,32 @@ export const DashboardLayout = ({
   <Container>
     <Box
       className="container"
-      display={'flex'}
-      flexWrap={'nowrap'}
-      alignItems={'center'}
+      display={"flex"}
+      flexWrap={"nowrap"}
+      alignItems={"flex-start"}
     >
       <Box
         className="left"
-        flex={'1 1 25%'}
-        display={'flex'}
-        alignItems={'center'}
-        justifyContent={'center'}
+        flex={"1 1 25%"}
+        display={"flex"}
+        alignItems={"center"}
+        justifyContent={"center"}
+        position={"sticky"}
+        top={"10%"}
       >
         <AvatarComponent />
       </Box>
-      <Box className="middle" flex={'1 1 50%'}>
+      <Box className="middle" flex={"1 1 50%"}>
         <PostsComponent />
       </Box>
       <Box
         className="right"
-        flex={'1 1 25%'}
-        display={'flex'}
-        alignItems={'center'}
-        justifyContent={'center'}
+        flex={"1 1 25%"}
+        display={"flex"}
+        alignItems={"center"}
+        justifyContent={"center"}
+        position={"sticky"}
+        top={"10%"}
       >
         <TrendingComponent />
       </Box>

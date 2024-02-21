@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   TextField,
   Button,
@@ -29,6 +29,7 @@ export interface FormProps {
   onSubmit: (e: React.FormEvent) => void;
   isLoading?: boolean;
   formHook: UseFormReturn<any>;
+  buttonPosition?: "center" | "right" | "left" | "full";
 }
 
 const Form: React.FC<FormProps> = ({
@@ -37,7 +38,19 @@ const Form: React.FC<FormProps> = ({
   onSubmit,
   isLoading,
   formHook: { setValue, getValues },
+  buttonPosition = "full",
 }) => {
+  const buttonPositionStyle = useMemo(
+    () =>
+      ({
+        left: "flex-start",
+        center: "center",
+        right: "flex-end",
+        full: "center",
+      }[buttonPosition]),
+    [buttonPosition]
+  );
+
   const renderInput = (input: FormInput, index: number) => {
     switch (input.type) {
       case "select":
@@ -100,13 +113,20 @@ const Form: React.FC<FormProps> = ({
   };
 
   return (
-    <form onSubmit={onSubmit}>
+    <form
+      onSubmit={onSubmit}
+      style={{
+        backgroundColor: "white",
+      }}
+    >
       <fieldset disabled={isLoading} style={{ border: "none" }}>
         <Box display="flex" flexDirection="column" gap={2}>
           {inputs.map(renderInput)}
-          <Button type="submit" variant="contained" color="primary">
-            {isLoading ? "Loading..." : submitText}
-          </Button>
+          <Box display="flex" justifyContent={buttonPositionStyle}>
+            <Button type="submit" variant="contained" color="primary">
+              {isLoading ? "Loading..." : submitText}
+            </Button>
+          </Box>
         </Box>
       </fieldset>
     </form>
