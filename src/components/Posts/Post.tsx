@@ -1,16 +1,28 @@
-import { Box, Button, Paper, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { CommentInterface, PostModelInterface } from "../../types/interfaces";
 import { Form, FormInput } from "../Form";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@apollo/client";
-import { CREATE_POST_COMMENT_MUTATION } from "./mutations";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import {
+  CREATE_POST_COMMENT_MUTATION,
+  LIKE_POST_MUTATION,
+  DISLIKE_POST_MUTATION,
+} from "./mutations";
 import { useAppData } from "../../hooks/useAppData";
 import { useState } from "react";
-import { GET_POSTS } from "../../pages/DashboardPage/queries";
+import { GET_DASHBOARD_POSTS } from "../../pages/DashboardPage/queries";
 import { PostContainer } from "./styled";
 import moment from "moment";
+import { CommentItem } from "./CommentItem";
 
-export const Post = ({ post }: { post: PostModelInterface }) => {
+export interface PostProps {
+  post: PostModelInterface;
+  collapseComments?: boolean;
+}
+
+export const Post = ({ post, collapseComments }: PostProps) => {
   const [commentOn, setCommentOn] = useState(false);
   const formHook = useForm({
     defaultValues: {
@@ -18,12 +30,17 @@ export const Post = ({ post }: { post: PostModelInterface }) => {
     },
     reValidateMode: "onChange",
   });
-  const [createPostComment, { loading }] = useMutation(
-    CREATE_POST_COMMENT_MUTATION
+  const [createPostComment, { loading: createPostCommentLoading }] =
+    useMutation(CREATE_POST_COMMENT_MUTATION);
+  const [likePost, { loading: likePostLoading }] =
+    useMutation(LIKE_POST_MUTATION);
+  const [dislikePost, { loading: dislikePostLoading }] = useMutation(
+    DISLIKE_POST_MUTATION
   );
+
   const { currentUser } = useAppData();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCreatePostComment = async (e: React.FormEvent) => {
     e.preventDefault();
     const values = formHook.getValues();
     if (!values.comment) {
@@ -38,12 +55,36 @@ export const Post = ({ post }: { post: PostModelInterface }) => {
           comment: values.comment,
         },
       },
-      refetchQueries: [{ query: GET_POSTS }],
+      refetchQueries: [{ query: GET_DASHBOARD_POSTS }],
     });
     setCommentOn(false);
   };
 
   const toggleCommentBox = () => setCommentOn(!commentOn);
+
+  const handleLikePost = async () => {
+    await likePost({
+      variables: {
+        data: {
+          postId: post.id,
+          userId: currentUser!.id,
+        },
+      },
+      refetchQueries: [{ query: GET_DASHBOARD_POSTS }],
+    });
+  };
+
+  const handleDislikePost = async () => {
+    await dislikePost({
+      variables: {
+        data: {
+          postId: post.id,
+          userId: currentUser!.id,
+        },
+      },
+      refetchQueries: [{ query: GET_DASHBOARD_POSTS }],
+    });
+  };
 
   const inputs: FormInput[] = [
     {
@@ -57,22 +98,67 @@ export const Post = ({ post }: { post: PostModelInterface }) => {
 
   return (
     <PostContainer>
-      <Box className="content" p={2}>
+      <Box
+        className="content"
+        p={2}
+        borderRadius={2}
+        sx={{
+          background: "#eee",
+        }}
+      >
         <Typography variant="body1">{post.content}</Typography>
       </Box>
-      <Box className="postedBy" display="flex" justifyContent="flex-end" p={2}>
-        <Typography
-          variant="body2"
-          fontStyle={"italic"}
-          fontWeight={700}
-          mr={1}
-        >
-          {post.postedBy.username}
-        </Typography>{" "}
-        -
-        <Typography variant="body2" ml={1}>
-          {moment(post.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
-        </Typography>
+      <Box
+        className="postedBy"
+        display="flex"
+        justifyContent="space-between"
+        p={2}
+      >
+        <Box display="flex" alignItems="center">
+          <Typography
+            variant="body2"
+            fontStyle={"italic"}
+            fontWeight={700}
+            mr={1}
+          >
+            {post.postedBy.username}
+          </Typography>{" "}
+          -
+          <Typography variant="body2" ml={1}>
+            {moment(post.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
+          </Typography>
+        </Box>
+        <Box display="flex" alignItems="center">
+          <Box position={"relative"} display={"flex"} alignItems={"center"}>
+            <ThumbUpIcon
+              sx={{
+                height: 16,
+                width: 16,
+                fill: "green",
+              }}
+            />
+            <Typography
+              variant="body2"
+              fontStyle={"italic"}
+              fontWeight={700}
+              mr={1}
+            >
+              {post.likes.length}
+            </Typography>
+          </Box>
+
+          <Box position={"relative"} display={"flex"} alignItems={"center"}>
+            <ThumbDownIcon sx={{ height: 16, width: 16, fill: "red" }} />
+            <Typography
+              variant="body2"
+              fontStyle={"italic"}
+              fontWeight={700}
+              mr={1}
+            >
+              {post.dislikes.length}
+            </Typography>
+          </Box>
+        </Box>
       </Box>
       <Box
         display="flex"
@@ -83,11 +169,53 @@ export const Post = ({ post }: { post: PostModelInterface }) => {
         p={2}
         mb={2}
       >
-        <Typography mb={1} fontSize={14} variant="h6">
-          {`${post.comments.length} Comment${
-            post.comments.length > 1 ? "s" : ""
-          }`}
-        </Typography>
+        <Box display={"flex"} alignItems={"center"} gap={1}>
+          {post.postedBy.id !== currentUser?.id && (
+            <>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleDislikePost}
+                disabled={dislikePostLoading}
+                sx={{
+                  padding: 1,
+                  width: 20,
+                  height: 20,
+                  minWidth: "auto",
+                  "& svg": {
+                    width: 14,
+                    height: 14,
+                  },
+                }}
+              >
+                <ThumbDownIcon />
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleLikePost}
+                disabled={likePostLoading}
+                sx={{
+                  padding: 1,
+                  width: 20,
+                  height: 20,
+                  minWidth: "auto",
+                  "& svg": {
+                    width: 14,
+                    height: 14,
+                  },
+                }}
+              >
+                <ThumbUpIcon />
+              </Button>
+            </>
+          )}
+          <Typography fontSize={14} variant="h6">
+            {`${post.comments.length} Comment${
+              post.comments.length > 1 ? "s" : ""
+            }`}
+          </Typography>
+        </Box>
         <Button
           size="small"
           variant="contained"
@@ -100,54 +228,14 @@ export const Post = ({ post }: { post: PostModelInterface }) => {
       {commentOn ? (
         <Form
           inputs={inputs}
-          onSubmit={handleSubmit}
+          onSubmit={handleCreatePostComment}
           submitText="Comment"
           formHook={formHook}
         />
       ) : (
         <>
           {post?.comments?.map((comment: CommentInterface) => (
-            <Box
-              key={comment.id}
-              className="comment"
-              mb={2}
-              mx={2}
-              p={2}
-              borderBottom={1}
-              borderColor={"primary.main"}
-              bgcolor={"#f3f3f3"}
-              borderRadius={3}
-            >
-              <Box>
-                <Typography variant="body1">{comment.comment}</Typography>
-              </Box>
-              <Box
-                display={"flex"}
-                justifyContent={"flex-start"}
-                mt={1}
-                alignItems={"center"}
-              >
-                <Typography
-                  variant="body2"
-                  fontSize={12}
-                  mr={0.5}
-                  fontWeight={700}
-                  fontStyle={"italic"}
-                >
-                  {`${comment.user.username} -`}
-                </Typography>
-                <Typography
-                  fontSize={12}
-                  variant="body2"
-                  fontStyle={"italic"}
-                  title={moment(comment.createdAt).format(
-                    "MMMM Do YYYY, h:mm:ss a"
-                  )}
-                >
-                  {moment(comment.createdAt).fromNow()}
-                </Typography>
-              </Box>
-            </Box>
+            <CommentItem key={comment.id} {...comment} />
           ))}
         </>
       )}

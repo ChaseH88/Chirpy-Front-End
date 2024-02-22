@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@apollo/client";
-import { GET_POSTS } from "./queries";
+import { GET_DASHBOARD_POSTS } from "./queries";
 import { useAppData } from "../../hooks/useAppData";
 import { useAuth } from "../../hooks/useAuth";
 import { Posts } from "../../components/Posts/Posts";
@@ -10,7 +10,11 @@ import { DashboardLayout } from "../../components/DashboardLayout";
 import { Box } from "@mui/material";
 
 const DashboardPage = () => {
-  const { loading: getPostLoading, error, data } = useQuery(GET_POSTS);
+  const {
+    loading: getPostLoading,
+    error,
+    data,
+  } = useQuery(GET_DASHBOARD_POSTS);
   const [createPost, { loading: createPostLoading }] =
     useMutation(CREATE_POST_MUTATION);
   const { currentUser } = useAppData();
@@ -36,7 +40,7 @@ const DashboardPage = () => {
           postedBy: currentUser!.id,
         },
       },
-      refetchQueries: [{ query: GET_POSTS }],
+      refetchQueries: [{ query: GET_DASHBOARD_POSTS }],
     });
   };
 
@@ -79,7 +83,11 @@ const DashboardPage = () => {
           <button onClick={logout}>Logout</button>
         </div>
       )}
-      TrendingComponent={() => <div>Trending</div>}
+      TrendingComponent={() => (
+        <div>
+          <Posts posts={data?.trendingPosts} />
+        </div>
+      )}
     />
   );
 };

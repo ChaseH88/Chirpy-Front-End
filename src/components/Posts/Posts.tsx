@@ -1,13 +1,13 @@
 import { Box, Stack, Typography } from "@mui/material";
 import { PostModelInterface } from "../../types/interfaces";
-import { Post } from "./Post";
+import { Post, PostProps } from "./Post";
 
-interface PostsProps {
+interface PostsProps extends Pick<PostProps, "collapseComments"> {
   posts: PostModelInterface[];
   headingText?: string;
 }
 
-export const Posts = ({ posts, headingText }: PostsProps) => {
+export const Posts = ({ posts, headingText, collapseComments }: PostsProps) => {
   return (
     <Stack>
       {headingText && (
@@ -19,7 +19,9 @@ export const Posts = ({ posts, headingText }: PostsProps) => {
       )}
       <Box>
         {posts?.length ? (
-          posts?.map((post) => <Post key={post.id} post={post} />)
+          posts?.map((post) => (
+            <Post key={post.id} post={post} collapseComments />
+          ))
         ) : (
           <Typography variant="h5" gutterBottom>
             No posts to show
