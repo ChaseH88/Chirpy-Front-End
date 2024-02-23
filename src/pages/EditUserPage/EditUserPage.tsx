@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
 import { Box, Button } from "@mui/material";
 import { useEffect } from "react";
+import { Avatar } from "../../components/Avatar";
 
 const EditUserPage = () => {
   const { loading: getPostLoading, data } = useQuery(GET_DASHBOARD_POSTS);
@@ -65,7 +66,13 @@ const EditUserPage = () => {
   return (
     <DashboardLayout
       PostsComponent={() => (
-        <Form
+        <Form<{
+          username: string;
+          firstName: string;
+          lastName: string;
+          bio: string;
+          photo: string;
+        }>
           formHook={formHook}
           inputs={inputs}
           onSubmit={() => console.log(formHook.getValues())}
@@ -73,9 +80,9 @@ const EditUserPage = () => {
         />
       )}
       AvatarComponent={() => (
-        <div>
-          <button onClick={logout}>Logout</button>
-        </div>
+        <Box>
+          <Avatar user={currentUser!} />
+        </Box>
       )}
       TrendingComponent={() => (
         <div>

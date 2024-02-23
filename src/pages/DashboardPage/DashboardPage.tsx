@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_DASHBOARD_POSTS } from "./queries";
 import { useAppData } from "../../hooks/useAppData";
-import { useAuth } from "../../hooks/useAuth";
 import { Posts } from "../../components/Posts/Posts";
 import { CREATE_POST_MUTATION } from "./mutations";
 import { Form, FormInput } from "../../components/Form";
@@ -10,6 +9,7 @@ import { DashboardLayout } from "../../components/DashboardLayout";
 import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { PostModelInterface } from "../../types/interfaces";
+import { Avatar } from "../../components/Avatar";
 
 const DashboardPage = () => {
   const {
@@ -20,7 +20,6 @@ const DashboardPage = () => {
   const [createPost, { loading: createPostLoading }] =
     useMutation(CREATE_POST_MUTATION);
   const { currentUser } = useAppData();
-  const { logout } = useAuth();
   const formHook = useForm({
     defaultValues: {
       content: "",
@@ -59,34 +58,29 @@ const DashboardPage = () => {
     <DashboardLayout
       PostsComponent={() => (
         <Box>
-          <Box mb={5} borderBottom={1} borderColor="primary.main" pb={2}>
-            <Form<PostModelInterface>
-              inputs={inputs}
-              onSubmit={handleSubmit}
-              submitText="Post"
-              formHook={formHook}
-              buttonPosition="right"
-            />
+          <Box mb={5} borderBottom={1} borderColor="primary.main" pb={5}>
+            <Box borderRadius={2} overflow={"hidden"} mx={3}>
+              <Form<PostModelInterface>
+                inputs={inputs}
+                onSubmit={handleSubmit}
+                submitText="Post"
+                formHook={formHook}
+                buttonPosition="right"
+              />
+            </Box>
           </Box>
-          <Box
-            border={1}
-            borderColor="primary.main"
-            borderTop={0}
-            px={4}
-            py={2}
-          >
+          <Box px={4} py={2}>
             <Posts posts={data?.allPosts} commentsToShow={3} />
           </Box>
         </Box>
       )}
       AvatarComponent={() => (
-        <div>
-          <button onClick={logout}>Logout</button>
-          <button onClick={() => navigate("/edit-user")}>Edit Profile</button>
-        </div>
+        <Box>
+          <Avatar user={currentUser!} />
+        </Box>
       )}
       TrendingComponent={() => (
-        <div>
+        <Box mx={2}>
           <Posts
             posts={data?.trendingPosts}
             OverrideCommentButton={
@@ -98,7 +92,7 @@ const DashboardPage = () => {
             }
             commentsToShow={2}
           />
-        </div>
+        </Box>
       )}
     />
   );

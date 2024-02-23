@@ -133,12 +133,23 @@ export const Post = ({
           </Typography>
         </Box>
         <Box display="flex" alignItems="center">
-          <Box position={"relative"} display={"flex"} alignItems={"center"}>
+          <Box
+            position={"relative"}
+            display={"flex"}
+            alignItems={"center"}
+            title={
+              post.likes.find((like) => like.id === currentUser?.id)
+                ? "You have liked this post"
+                : ""
+            }
+          >
             <ThumbUpIcon
               sx={{
                 height: 16,
                 width: 16,
-                fill: "green",
+                fill: post.likes.find((like) => like.id === currentUser?.id)
+                  ? "green"
+                  : "gray",
               }}
             />
             <Typography
@@ -151,8 +162,27 @@ export const Post = ({
             </Typography>
           </Box>
 
-          <Box position={"relative"} display={"flex"} alignItems={"center"}>
-            <ThumbDownIcon sx={{ height: 16, width: 16, fill: "red" }} />
+          <Box
+            position={"relative"}
+            display={"flex"}
+            alignItems={"center"}
+            title={
+              post.dislikes.find((dislike) => dislike.id === currentUser?.id)
+                ? "You have disliked this post"
+                : ""
+            }
+          >
+            <ThumbDownIcon
+              sx={{
+                height: 16,
+                width: 16,
+                fill: post.dislikes.find(
+                  (dislike) => dislike.id === currentUser?.id
+                )
+                  ? "red"
+                  : "gray",
+              }}
+            />
             <Typography
               variant="body2"
               fontStyle={"italic"}
