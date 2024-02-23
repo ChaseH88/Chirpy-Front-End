@@ -2,12 +2,18 @@ import { Box, Stack, Typography } from "@mui/material";
 import { PostModelInterface } from "../../types/interfaces";
 import { Post, PostProps } from "./Post";
 
-interface PostsProps extends Pick<PostProps, "collapseComments"> {
+interface PostsProps
+  extends Pick<PostProps, "OverrideCommentButton" | "commentsToShow"> {
   posts: PostModelInterface[];
   headingText?: string;
 }
 
-export const Posts = ({ posts, headingText, collapseComments }: PostsProps) => {
+export const Posts = ({
+  posts,
+  headingText,
+  OverrideCommentButton,
+  commentsToShow,
+}: PostsProps) => {
   return (
     <Stack>
       {headingText && (
@@ -20,7 +26,12 @@ export const Posts = ({ posts, headingText, collapseComments }: PostsProps) => {
       <Box>
         {posts?.length ? (
           posts?.map((post) => (
-            <Post key={post.id} post={post} collapseComments />
+            <Post
+              key={post.id}
+              post={post}
+              OverrideCommentButton={OverrideCommentButton}
+              commentsToShow={commentsToShow}
+            />
           ))
         ) : (
           <Typography variant="h5" gutterBottom>

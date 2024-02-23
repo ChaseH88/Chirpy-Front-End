@@ -16,13 +16,19 @@ import { GET_DASHBOARD_POSTS } from "../../pages/DashboardPage/queries";
 import { PostContainer } from "./styled";
 import moment from "moment";
 import { CommentItem } from "./CommentItem";
+import { Comments } from "./Comments";
 
 export interface PostProps {
   post: PostModelInterface;
-  collapseComments?: boolean;
+  OverrideCommentButton?: React.ReactNode;
+  commentsToShow: number;
 }
 
-export const Post = ({ post, collapseComments }: PostProps) => {
+export const Post = ({
+  post,
+  OverrideCommentButton,
+  commentsToShow,
+}: PostProps) => {
   const [commentOn, setCommentOn] = useState(false);
   const formHook = useForm({
     defaultValues: {
@@ -40,10 +46,8 @@ export const Post = ({ post, collapseComments }: PostProps) => {
 
   const { currentUser } = useAppData();
 
-  const handleCreatePostComment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const values = formHook.getValues();
-    if (!values.comment) {
+  const handleCreatePostComment = async (data: CommentInterface) => {
+    if (!data.comment) {
       alert("Please fill out all fields");
       return;
     }
@@ -52,7 +56,7 @@ export const Post = ({ post, collapseComments }: PostProps) => {
         data: {
           postId: post.id,
           userId: currentUser!.id,
-          comment: values.comment,
+          comment: data.comment,
         },
       },
       refetchQueries: [{ query: GET_DASHBOARD_POSTS }],
@@ -226,7 +230,7 @@ export const Post = ({ post, collapseComments }: PostProps) => {
         </Button>
       </Box>
       {commentOn ? (
-        <Form
+        <Form<CommentInterface>
           inputs={inputs}
           onSubmit={handleCreatePostComment}
           submitText="Comment"
@@ -234,9 +238,11 @@ export const Post = ({ post, collapseComments }: PostProps) => {
         />
       ) : (
         <>
-          {post?.comments?.map((comment: CommentInterface) => (
-            <CommentItem key={comment.id} {...comment} />
-          ))}
+          <Comments
+            comments={post.comments}
+            postsToShow={commentsToShow}
+            OverrideToggleButton={OverrideCommentButton}
+          />
         </>
       )}
     </PostContainer>

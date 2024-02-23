@@ -3,6 +3,10 @@ export interface UserModelInterface {
   email: string;
   password: string;
   username: string;
+  firstName: string;
+  lastName: string;
+  bio: string;
+  photo: string;
   posts: PostModelInterface[];
   createdAt: Date;
   updatedAt: Date;

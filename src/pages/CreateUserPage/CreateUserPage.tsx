@@ -22,21 +22,21 @@ const CreateUserPage = () => {
 
   const [createUser, { loading }] = useMutation(CREATE_USER_MUTATION);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // every value is required, lets check with an array
-    const valuesExist = Object.values(formHook.getValues()).every(
+  const handleSubmit = async (data: {
+    username: string;
+    email: string;
+    password: string;
+  }) => {
+    const valuesExist = [data.username, data.password, data.email].every(
       (value) => value
     );
-    const values = formHook.getValues();
-
     if (!valuesExist) {
       alert("Please fill out all fields");
       return;
     }
 
     const response = (await createUser({
-      variables: values,
+      variables: data,
     })) as {
       data: {
         createUser: {
@@ -75,7 +75,11 @@ const CreateUserPage = () => {
   return (
     <HomeLayout
       FormComponent={() => (
-        <Form
+        <Form<{
+          username: string;
+          email: string;
+          password: string;
+        }>
           inputs={inputs}
           submitText="Create User"
           onSubmit={handleSubmit}

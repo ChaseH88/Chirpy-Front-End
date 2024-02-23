@@ -8,6 +8,11 @@ import { useAuth } from "../../hooks/useAuth";
 import { HomeLayout } from "../../components/HomeLayout";
 import { Box, Button } from "@mui/material";
 
+type FormDataType = {
+  username: string;
+  password: string;
+};
+
 const LoginPage = () => {
   const formHook = useForm({
     defaultValues: {
@@ -20,15 +25,14 @@ const LoginPage = () => {
   const [loginUser, { loading, error }] = useMutation(LOGIN_MUTATION);
   const { login } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const values = formHook.getValues();
-    if (!values.username || !values.password) {
+  const handleSubmit = async (data: FormDataType) => {
+    console.log(data);
+    if (!data.username || !data.password) {
       alert("Please fill out all fields");
       return;
     }
     const res = (await loginUser({
-      variables: values,
+      variables: data,
     })) as {
       data: {
         login: {
@@ -61,7 +65,7 @@ const LoginPage = () => {
   return (
     <HomeLayout
       FormComponent={() => (
-        <Form
+        <Form<FormDataType>
           inputs={inputs}
           onSubmit={handleSubmit}
           submitText="Login"

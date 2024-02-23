@@ -7,7 +7,9 @@ import { CREATE_POST_MUTATION } from "./mutations";
 import { Form, FormInput } from "../../components/Form";
 import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { PostModelInterface } from "../../types/interfaces";
 
 const DashboardPage = () => {
   const {
@@ -25,18 +27,17 @@ const DashboardPage = () => {
     },
     reValidateMode: "onChange",
   });
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const values = formHook.getValues();
-    if (!values.content) {
+  const handleSubmit = async (data: PostModelInterface) => {
+    if (!data.content) {
       alert("Please fill out all fields");
       return;
     }
     await createPost({
       variables: {
         data: {
-          content: values.content,
+          content: data.content,
           postedBy: currentUser!.id,
         },
       },
@@ -59,7 +60,7 @@ const DashboardPage = () => {
       PostsComponent={() => (
         <Box>
           <Box mb={5} borderBottom={1} borderColor="primary.main" pb={2}>
-            <Form
+            <Form<PostModelInterface>
               inputs={inputs}
               onSubmit={handleSubmit}
               submitText="Post"
@@ -74,18 +75,29 @@ const DashboardPage = () => {
             px={4}
             py={2}
           >
-            <Posts posts={data?.allPosts} />
+            <Posts posts={data?.allPosts} commentsToShow={3} />
           </Box>
         </Box>
       )}
       AvatarComponent={() => (
         <div>
           <button onClick={logout}>Logout</button>
+          <button onClick={() => navigate("/edit-user")}>Edit Profile</button>
         </div>
       )}
       TrendingComponent={() => (
         <div>
-          <Posts posts={data?.trendingPosts} />
+          <Posts
+            posts={data?.trendingPosts}
+            OverrideCommentButton={
+              <Box display="flex" justifyContent="center">
+                <Button variant="text" color="primary">
+                  See More
+                </Button>
+              </Box>
+            }
+            commentsToShow={2}
+          />
         </div>
       )}
     />

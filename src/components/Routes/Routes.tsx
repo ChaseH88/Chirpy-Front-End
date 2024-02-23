@@ -1,9 +1,10 @@
-import { Navigate, Route, Routes as RouterRoutes } from 'react-router-dom';
-import { CreateUserPage } from '../../pages/CreateUserPage';
-import { LoginPage } from '../../pages/LoginPage';
-import { DashboardPage } from '../../pages/DashboardPage';
-import { ProtectedRoute } from './ProtectedRoute';
-import { useAuth } from '../../hooks/useAuth';
+import { Navigate, Route, Routes as RouterRoutes } from "react-router-dom";
+import { CreateUserPage } from "../../pages/CreateUserPage";
+import { LoginPage } from "../../pages/LoginPage";
+import { DashboardPage } from "../../pages/DashboardPage";
+import { ProtectedRoute } from "./ProtectedRoute";
+import { useAuth } from "../../hooks/useAuth";
+import { EditUserPage } from "../../pages/EditUserPage";
 
 const Routes = (): JSX.Element => {
   const { isLoggedIn } = useAuth();
@@ -24,6 +25,14 @@ const Routes = (): JSX.Element => {
         element={
           <ProtectedRoute>
             <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/edit-user"
+        element={
+          <ProtectedRoute>
+            <EditUserPage />
           </ProtectedRoute>
         }
       />
