@@ -19,7 +19,10 @@ export interface FormInput {
   required: boolean;
   label: string;
   value?: string;
-  options?: string[];
+  options?: {
+    id: string;
+    label: string;
+  }[];
 }
 
 export interface FormProps<T = any> {
@@ -62,8 +65,8 @@ const Form = <T,>({
                   <InputLabel>{input.label}</InputLabel>
                   <Select {...field} label={input.label}>
                     {input.options?.map((option, idx) => (
-                      <MenuItem key={idx} value={option}>
-                        {option}
+                      <MenuItem key={idx} value={option.id}>
+                        {option.label}
                       </MenuItem>
                     ))}
                   </Select>

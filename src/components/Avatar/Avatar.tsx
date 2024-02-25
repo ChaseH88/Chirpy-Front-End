@@ -24,7 +24,7 @@ interface AvatarProps {
   }[];
 }
 
-const icons = {
+export const icons = {
   earth: <EarthIcon />,
   smile: <EmojiEmotionsIcon />,
   snowflake: <AcUnitIcon />,
@@ -114,28 +114,48 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
       >
         {Icon}
       </Box>
-      <Box mb={1}>
-        <Typography variant="h4">{user.username}</Typography>
-      </Box>
-      <Box>
+      {(user.firstName || user.lastName) && (
+        <Box mb={1}>
+          <Typography variant="h4">{user.username}</Typography>
+        </Box>
+      )}
+      <Box display={"flex"} flexDirection={"row"} alignItems={"center"} gap={1}>
+        <Typography variant="body1" fontSize={12}>
+          {user.firstName} {user.lastName}
+        </Typography>
+        -
         {user.posts?.length ? (
-          <Typography variant="body1">
+          <Typography variant="body1" fontSize={12}>
             {user.posts.length} Post{user.posts.length > 1 ? "s" : ""}
           </Typography>
         ) : (
           <Typography variant="h6">Create a post!</Typography>
         )}
       </Box>
-      <Box display={"flex"} gap={1} mt={2} flexDirection={"column"}>
+      <Box mt={1}>
+        <Typography variant="body1" fontSize={11} fontStyle={"italic"}>
+          {user.bio}
+        </Typography>
+      </Box>
+      <Box
+        display={"flex"}
+        gap={1}
+        mt={2}
+        flexDirection={"column"}
+        justifyContent={"flex-start"}
+        width={"100%"}
+      >
         {_buttons.map((button: any, index) => (
-          <Button
+          <Box
             key={index}
-            variant={button.variant}
-            color={button.color}
-            onClick={button.onClick}
+            borderBottom={index === _buttons.length - 1 ? 0 : 1}
+            borderColor={"rgba(0, 0, 0, 0.2)"}
+            padding={1}
           >
-            {button.text}
-          </Button>
+            <Button color={button.color} onClick={button.onClick}>
+              {button.text}
+            </Button>
+          </Box>
         ))}
       </Box>
     </Box>

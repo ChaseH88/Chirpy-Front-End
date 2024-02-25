@@ -18,6 +18,7 @@ export const DashboardLayout = ({
       display={"flex"}
       flexWrap={"nowrap"}
       alignItems={"flex-start"}
+      p={4}
     >
       <Box
         className="left"

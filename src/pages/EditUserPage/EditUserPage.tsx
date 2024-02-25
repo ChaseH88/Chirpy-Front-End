@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { Avatar } from "../../components/Avatar";
 import { EDIT_USER_MUTATION } from "./mutations";
 import { UserModelInterface } from "../../types/interfaces";
+import { icons } from "../../components/Avatar";
 
 type FormDataType = {
   username: string;
@@ -50,12 +51,10 @@ const EditUserPage = () => {
       },
     })) as {
       data: {
-        editUser: {
-          user: UserModelInterface;
-        };
+        editUser: UserModelInterface;
       };
     };
-    setCurrentUser(res.data.editUser.user);
+    setCurrentUser(res.data.editUser);
   };
 
   const inputs: FormInput[] = [
@@ -89,10 +88,14 @@ const EditUserPage = () => {
     },
     {
       name: "photo",
-      type: "text",
+      type: "select",
       placeholder: "Enter your photo",
       required: false,
       label: "Photo",
+      options: Object.keys(icons).map((key) => ({
+        id: key,
+        label: key.charAt(0).toUpperCase() + key.slice(1),
+      })),
     },
   ];
 
