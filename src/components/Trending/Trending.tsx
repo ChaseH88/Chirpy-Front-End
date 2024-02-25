@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { PostModelInterface } from "../../types/interfaces";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
