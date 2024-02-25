@@ -46,7 +46,10 @@ const AppDataProvider = ({
     error: currentUserError,
   } = useQuery(CURRENT_USER_QUERY, {
     variables: { token: getToken() },
-    skip: !isLoggedIn,
+    skip: !isLoggedIn && getToken() !== null,
+    defaultOptions: {
+      fetchPolicy: "network-only",
+    },
   });
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { client } from "../Apollo";
 
 export interface AuthContext {
   isLoggedIn: boolean;
@@ -31,6 +32,7 @@ const AuthProvider = ({
     const token = getToken();
     if (token) {
       setLoggedIn(true);
+      (client as any).link.options.headers.authorization = token;
     }
   }, [location, getToken]);
 

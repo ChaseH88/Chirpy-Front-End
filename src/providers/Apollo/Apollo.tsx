@@ -6,7 +6,7 @@ import {
 
 const BASE_URL = "http://192.168.4.29:4000/graphql";
 
-const client = new ApolloClient({
+export const client = new ApolloClient({
   cache: new InMemoryCache(),
   uri: BASE_URL,
   headers: {

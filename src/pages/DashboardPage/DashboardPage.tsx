@@ -59,8 +59,6 @@ const DashboardPage = () => {
     });
   };
 
-  console.log(data?.allPosts, parseInt(data?.allPosts?.nextToken || "0"));
-
   const handleLoadMore = () => {
     if (data?.allPosts?.nextToken) {
       fetchMore({
@@ -135,7 +133,7 @@ const DashboardPage = () => {
               <CircularProgress variant="indeterminate" color="secondary" />
             ) : (
               <>
-                <Posts posts={data?.allPosts?.posts} commentsToShow={3} />
+                <Posts posts={data?.allPosts?.items} commentsToShow={3} />
                 {data?.allPosts?.nextToken && (
                   <Box textAlign="center" mt={2}>
                     <Button

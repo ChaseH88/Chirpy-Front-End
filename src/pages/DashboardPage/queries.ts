@@ -31,7 +31,7 @@ export const GET_DASHBOARD_POSTS = gql`
     allPosts(nextToken: $nextToken, limit: $limit) {
       nextToken
       totalCount
-      posts {
+      items {
         id
         postedBy {
           id
