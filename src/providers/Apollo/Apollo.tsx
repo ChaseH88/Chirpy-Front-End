@@ -2,11 +2,16 @@ import {
   ApolloProvider as _ApolloProvider,
   ApolloClient,
   InMemoryCache,
-} from '@apollo/client';
+} from "@apollo/client";
+
+const BASE_URL = "http://192.168.4.29:4000/graphql";
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  uri: 'http://localhost:4000/graphql',
+  uri: BASE_URL,
+  headers: {
+    authorization: localStorage.getItem("token") || "",
+  },
 });
 
 const ApolloProvider = ({

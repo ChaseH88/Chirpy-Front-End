@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const CURRENT_USER_QUERY = gql`
   query CurrentUser($token: String!) {
@@ -7,6 +7,9 @@ export const CURRENT_USER_QUERY = gql`
       username
       email
       createdAt
+      firstName
+      lastName
+      bio
       posts {
         id
         content

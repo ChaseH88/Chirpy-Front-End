@@ -1,19 +1,28 @@
-import { useQuery } from "@apollo/client";
-import { GET_DASHBOARD_POSTS } from "../DashboardPage/queries";
+import { useMutation } from "@apollo/client";
 import { useAppData } from "../../hooks/useAppData";
 import { useAuth } from "../../hooks/useAuth";
-import { Posts } from "../../components/Posts/Posts";
 import { Form, FormInput } from "../../components/Form";
 import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useEffect } from "react";
 import { Avatar } from "../../components/Avatar";
+import { EDIT_USER_MUTATION } from "./mutations";
+import { UserModelInterface } from "../../types/interfaces";
+
+type FormDataType = {
+  username: string;
+  firstName: string;
+  lastName: string;
+  bio: string;
+  photo: string;
+};
 
 const EditUserPage = () => {
-  const { loading: getPostLoading, data } = useQuery(GET_DASHBOARD_POSTS);
-  const { currentUser } = useAppData();
-  const { logout } = useAuth();
+  const [editUser, { loading: editUserLoading, error: editUserError }] =
+    useMutation(EDIT_USER_MUTATION);
+
+  const { currentUser, setCurrentUser } = useAppData();
   const formHook = useForm({
     reValidateMode: "onChange",
   });
@@ -22,8 +31,32 @@ const EditUserPage = () => {
     if (currentUser) {
       formHook.setValue("username", currentUser.username);
       formHook.setValue("firstName", currentUser.firstName);
+      formHook.setValue("lastName", currentUser.lastName);
+      formHook.setValue("bio", currentUser.bio);
+      formHook.setValue("photo", currentUser.photo);
     }
   }, [currentUser, formHook]);
+
+  const handleSubmit = async (data: FormDataType) => {
+    if (!data.username) {
+      alert("Please fill out all fields");
+      return;
+    }
+
+    const res = (await editUser({
+      variables: {
+        id: currentUser!.id,
+        data,
+      },
+    })) as {
+      data: {
+        editUser: {
+          user: UserModelInterface;
+        };
+      };
+    };
+    setCurrentUser(res.data.editUser.user);
+  };
 
   const inputs: FormInput[] = [
     {
@@ -66,28 +99,37 @@ const EditUserPage = () => {
   return (
     <DashboardLayout
       PostsComponent={() => (
-        <Form<{
-          username: string;
-          firstName: string;
-          lastName: string;
-          bio: string;
-          photo: string;
-        }>
-          formHook={formHook}
-          inputs={inputs}
-          onSubmit={() => console.log(formHook.getValues())}
-          submitText="Update"
-        />
+        <Box
+          p={6}
+          borderRadius={3}
+          sx={{
+            backgroundColor: "white",
+          }}
+        >
+          <Box mb={3}>
+            <Typography variant="body1">Edit Profile</Typography>
+          </Box>
+          <Box>
+            <Form<{
+              username: string;
+              firstName: string;
+              lastName: string;
+              bio: string;
+              photo: string;
+            }>
+              formHook={formHook}
+              inputs={inputs}
+              onSubmit={handleSubmit}
+              submitText="Update"
+              isLoading={editUserLoading}
+            />
+          </Box>
+        </Box>
       )}
       AvatarComponent={() => (
         <Box>
           <Avatar user={currentUser!} />
         </Box>
-      )}
-      TrendingComponent={() => (
-        <div>
-          <Posts posts={data?.trendingPosts} commentsToShow={2} />
-        </div>
       )}
     />
   );
