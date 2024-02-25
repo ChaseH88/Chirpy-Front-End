@@ -11,9 +11,10 @@ import { useNavigate } from "react-router-dom";
 import { PostModelInterface } from "../../types/interfaces";
 import { Avatar } from "../../components/Avatar";
 import { Trending } from "../../components/Trending";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const DashboardPage = () => {
+  const [nextToken, setNextToken] = useState(0);
   const {
     loading: getPostLoading,
     data,
@@ -34,6 +35,7 @@ const DashboardPage = () => {
     reValidateMode: "onChange",
   });
   const navigate = useNavigate();
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (data: PostModelInterface) => {
     if (!data.content) {
@@ -51,7 +53,7 @@ const DashboardPage = () => {
         {
           query: GET_DASHBOARD_POSTS,
           variables: {
-            nextToken: 0,
+            nextToken,
             limit: 10,
           },
         },
@@ -59,7 +61,7 @@ const DashboardPage = () => {
     });
   };
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (data?.allPosts?.nextToken) {
       fetchMore({
         variables: {
@@ -69,19 +71,48 @@ const DashboardPage = () => {
         updateQuery: (prev, { fetchMoreResult }) => {
           if (!fetchMoreResult) return prev;
           return {
+            trendingPosts: prev.trendingPosts,
             allPosts: {
               __typename: prev.allPosts.__typename,
-              posts: [
-                ...prev.allPosts.posts,
-                ...fetchMoreResult.allPosts.posts,
+              items: [
+                ...prev.allPosts.items,
+                ...fetchMoreResult.allPosts.items,
               ],
               nextToken: fetchMoreResult.allPosts.nextToken,
+              totalCount: fetchMoreResult.allPosts.totalCount,
             },
           };
         },
       });
+      setNextToken(parseInt(data.allPosts.nextToken));
     }
-  };
+  }, [data, fetchMore]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            handleLoadMore();
+          }
+        });
+      },
+      {
+        rootMargin: "100px",
+      }
+    );
+
+    const currentSentinel = bottomRef.current;
+    if (currentSentinel) {
+      observer.observe(currentSentinel);
+    }
+
+    return () => {
+      if (currentSentinel) {
+        observer.unobserve(currentSentinel);
+      }
+    };
+  }, [data, handleLoadMore]);
 
   const inputs: FormInput[] = [
     {
@@ -134,17 +165,7 @@ const DashboardPage = () => {
             ) : (
               <>
                 <Posts posts={data?.allPosts?.items} commentsToShow={3} />
-                {data?.allPosts?.nextToken && (
-                  <Box textAlign="center" mt={2}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleLoadMore}
-                    >
-                      Load More
-                    </Button>
-                  </Box>
-                )}
+                {data?.allPosts?.nextToken && <Box ref={bottomRef} />}
               </>
             )}
           </Box>
