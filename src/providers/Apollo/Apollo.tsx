@@ -1,5 +1,5 @@
 import {
-  ApolloProvider as _ApolloProvider,
+  ApolloProvider as ApolloProviderDep,
   ApolloClient,
   InMemoryCache,
 } from "@apollo/client";
@@ -19,7 +19,7 @@ const ApolloProvider = ({
 }: {
   children: React.ReactNode;
 }): JSX.Element => (
-  <_ApolloProvider client={client}>{children}</_ApolloProvider>
+  <ApolloProviderDep client={client}>{children}</ApolloProviderDep>
 );
 
 export { ApolloProvider };

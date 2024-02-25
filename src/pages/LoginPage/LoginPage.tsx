@@ -26,23 +26,26 @@ const LoginPage = () => {
   const { login } = useAuth();
 
   const handleSubmit = async (data: FormDataType) => {
-    console.log(data);
-    if (!data.username || !data.password) {
-      alert("Please fill out all fields");
-      return;
-    }
-    const res = (await loginUser({
-      variables: data,
-    })) as {
-      data: {
-        login: {
-          token: string;
-          user: UserModelInterface;
+    try {
+      if (!data.username || !data.password) {
+        alert("Please fill out all fields");
+        return;
+      }
+      const res = (await loginUser({
+        variables: data,
+      })) as {
+        data: {
+          login: {
+            token: string;
+            user: UserModelInterface;
+          };
         };
       };
-    };
 
-    login(res.data.login.token);
+      login(res.data.login.token);
+    } catch (err) {
+      console.log(error?.message);
+    }
   };
 
   const inputs: FormInput[] = [

@@ -59,7 +59,11 @@ export const Post = ({
           comment: data.comment,
         },
       },
-      refetchQueries: [{ query: GET_DASHBOARD_POSTS }],
+      refetchQueries: [
+        {
+          query: GET_DASHBOARD_POSTS,
+        },
+      ],
     });
     setCommentOn(false);
   };

@@ -11,9 +11,19 @@ import { useNavigate } from "react-router-dom";
 import { PostModelInterface } from "../../types/interfaces";
 import { Avatar } from "../../components/Avatar";
 import { Trending } from "../../components/Trending";
+import { useEffect } from "react";
 
 const DashboardPage = () => {
-  const { loading: getPostLoading, data } = useQuery(GET_DASHBOARD_POSTS);
+  const {
+    loading: getPostLoading,
+    data,
+    fetchMore,
+  } = useQuery(GET_DASHBOARD_POSTS, {
+    variables: {
+      nextToken: 0,
+      limit: 10,
+    },
+  });
   const [createPost, { loading: createPostLoading }] =
     useMutation(CREATE_POST_MUTATION);
   const { currentUser } = useAppData();
@@ -37,8 +47,42 @@ const DashboardPage = () => {
           postedBy: currentUser!.id,
         },
       },
-      refetchQueries: [{ query: GET_DASHBOARD_POSTS }],
+      refetchQueries: [
+        {
+          query: GET_DASHBOARD_POSTS,
+          variables: {
+            nextToken: 0,
+            limit: 10,
+          },
+        },
+      ],
     });
+  };
+
+  console.log(data?.allPosts, parseInt(data?.allPosts?.nextToken || "0"));
+
+  const handleLoadMore = () => {
+    if (data?.allPosts?.nextToken) {
+      fetchMore({
+        variables: {
+          nextToken: parseInt(data.allPosts.nextToken),
+          limit: 10,
+        },
+        updateQuery: (prev, { fetchMoreResult }) => {
+          if (!fetchMoreResult) return prev;
+          return {
+            allPosts: {
+              __typename: prev.allPosts.__typename,
+              posts: [
+                ...prev.allPosts.posts,
+                ...fetchMoreResult.allPosts.posts,
+              ],
+              nextToken: fetchMoreResult.allPosts.nextToken,
+            },
+          };
+        },
+      });
+    }
   };
 
   const inputs: FormInput[] = [
@@ -90,7 +134,20 @@ const DashboardPage = () => {
             {getPostLoading ? (
               <CircularProgress variant="indeterminate" color="secondary" />
             ) : (
-              <Posts posts={data?.allPosts} commentsToShow={3} />
+              <>
+                <Posts posts={data?.allPosts?.posts} commentsToShow={3} />
+                {data?.allPosts?.nextToken && (
+                  <Box textAlign="center" mt={2}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleLoadMore}
+                    >
+                      Load More
+                    </Button>
+                  </Box>
+                )}
+              </>
             )}
           </Box>
         </Box>
