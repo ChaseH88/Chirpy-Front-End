@@ -17,6 +17,7 @@ import { PostContainer } from "./styled";
 import moment from "moment";
 import { CommentItem } from "./CommentItem";
 import { Comments } from "./Comments";
+import { UserProfilePhoto } from "../UserProfilePhoto";
 
 export interface PostProps {
   post: PostModelInterface;
@@ -123,6 +124,15 @@ export const Post = ({
         p={2}
       >
         <Box display="flex" alignItems="center">
+          <Box mr={1}>
+            <UserProfilePhoto
+              icon={post.postedBy.photo as any}
+              width={18}
+              height={18}
+              svgHeight={12}
+              svgWidth={12}
+            />
+          </Box>
           <Typography
             variant="body2"
             fontStyle={"italic"}

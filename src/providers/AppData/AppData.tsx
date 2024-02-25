@@ -56,13 +56,10 @@ const AppDataProvider = ({
     if (currentUserError) {
       const error = normalizeGraphQLError(currentUserError);
       if (error) {
-        console.error(error);
         logout();
       }
     }
   }, [currentUserError, logout]);
-
-  console.log("data", currentUserError?.graphQLErrors[0]);
 
   const setCurrentUser = (user: UserModelInterface | null) => {
     dispatch({ type: "SET_CURRENT_USER", payload: user });

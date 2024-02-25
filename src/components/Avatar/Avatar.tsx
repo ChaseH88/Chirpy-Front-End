@@ -13,6 +13,7 @@ import FlightIcon from "@mui/icons-material/Flight";
 import HikingIcon from "@mui/icons-material/Hiking";
 import PersonIcon from "@mui/icons-material/Person";
 import { useAuth } from "../../hooks/useAuth";
+import { UserProfilePhoto } from "../UserProfilePhoto";
 
 interface AvatarProps {
   user: UserModelInterface;
@@ -95,25 +96,7 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
       width={"100%"}
       borderRadius={2}
     >
-      <Box
-        sx={{
-          width: 100,
-          height: 100,
-          borderRadius: "50%",
-          backgroundColor: "primary.main",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "white",
-          marginBottom: 2,
-          "& svg": {
-            width: 65,
-            height: 65,
-          },
-        }}
-      >
-        {Icon}
-      </Box>
+      <UserProfilePhoto icon={user.photo as IconType} />
       {(user.firstName || user.lastName) && (
         <Box mb={1}>
           <Typography variant="h4">{user.username}</Typography>
