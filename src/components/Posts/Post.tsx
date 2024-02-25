@@ -5,11 +5,7 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "@apollo/client";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
-import {
-  CREATE_POST_COMMENT_MUTATION,
-  LIKE_POST_MUTATION,
-  DISLIKE_POST_MUTATION,
-} from "./mutations";
+import { CREATE_POST_COMMENT_MUTATION } from "./mutations";
 import { useAppData } from "../../hooks/useAppData";
 import { useState } from "react";
 import { GET_DASHBOARD_POSTS } from "../../pages/DashboardPage/queries";
@@ -18,6 +14,7 @@ import moment from "moment";
 import { CommentItem } from "./CommentItem";
 import { Comments } from "./Comments";
 import { UserProfilePhoto } from "../UserProfilePhoto";
+import { LikeDislikeButtons } from "../LikeDislikeButtons/LikeDislikeButtons";
 
 export interface PostProps {
   post: PostModelInterface;
@@ -39,11 +36,6 @@ export const Post = ({
   });
   const [createPostComment, { loading: createPostCommentLoading }] =
     useMutation(CREATE_POST_COMMENT_MUTATION);
-  const [likePost, { loading: likePostLoading }] =
-    useMutation(LIKE_POST_MUTATION);
-  const [dislikePost, { loading: dislikePostLoading }] = useMutation(
-    DISLIKE_POST_MUTATION
-  );
 
   const { currentUser } = useAppData();
 
@@ -70,30 +62,6 @@ export const Post = ({
   };
 
   const toggleCommentBox = () => setCommentOn(!commentOn);
-
-  const handleLikePost = async () => {
-    await likePost({
-      variables: {
-        data: {
-          postId: post.id,
-          userId: currentUser!.id,
-        },
-      },
-      refetchQueries: [{ query: GET_DASHBOARD_POSTS }],
-    });
-  };
-
-  const handleDislikePost = async () => {
-    await dislikePost({
-      variables: {
-        data: {
-          postId: post.id,
-          userId: currentUser!.id,
-        },
-      },
-      refetchQueries: [{ query: GET_DASHBOARD_POSTS }],
-    });
-  };
 
   const inputs: FormInput[] = [
     {
@@ -147,65 +115,12 @@ export const Post = ({
           </Typography>
         </Box>
         <Box display="flex" alignItems="center">
-          <Box
-            position={"relative"}
-            display={"flex"}
-            alignItems={"center"}
-            title={
-              post.likes.find((like) => like.id === currentUser?.id)
-                ? "You have liked this post"
-                : ""
-            }
-          >
-            <ThumbUpIcon
-              sx={{
-                height: 16,
-                width: 16,
-                fill: post.likes.find((like) => like.id === currentUser?.id)
-                  ? "green"
-                  : "gray",
-              }}
-            />
-            <Typography
-              variant="body2"
-              fontStyle={"italic"}
-              fontWeight={700}
-              mr={1}
-            >
-              {post.likes.length}
-            </Typography>
-          </Box>
-
-          <Box
-            position={"relative"}
-            display={"flex"}
-            alignItems={"center"}
-            title={
-              post.dislikes.find((dislike) => dislike.id === currentUser?.id)
-                ? "You have disliked this post"
-                : ""
-            }
-          >
-            <ThumbDownIcon
-              sx={{
-                height: 16,
-                width: 16,
-                fill: post.dislikes.find(
-                  (dislike) => dislike.id === currentUser?.id
-                )
-                  ? "red"
-                  : "gray",
-              }}
-            />
-            <Typography
-              variant="body2"
-              fontStyle={"italic"}
-              fontWeight={700}
-              mr={1}
-            >
-              {post.dislikes.length}
-            </Typography>
-          </Box>
+          <LikeDislikeButtons
+            id={post.id}
+            likes={post.likes}
+            dislikes={post.dislikes}
+            postedBy={post.postedBy}
+          />
         </Box>
       </Box>
       <Box
@@ -218,46 +133,6 @@ export const Post = ({
         mb={2}
       >
         <Box display={"flex"} alignItems={"center"} gap={1}>
-          {post.postedBy.id !== currentUser?.id && (
-            <>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleDislikePost}
-                disabled={dislikePostLoading}
-                sx={{
-                  padding: 1,
-                  width: 20,
-                  height: 20,
-                  minWidth: "auto",
-                  "& svg": {
-                    width: 14,
-                    height: 14,
-                  },
-                }}
-              >
-                <ThumbDownIcon />
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleLikePost}
-                disabled={likePostLoading}
-                sx={{
-                  padding: 1,
-                  width: 20,
-                  height: 20,
-                  minWidth: "auto",
-                  "& svg": {
-                    width: 14,
-                    height: 14,
-                  },
-                }}
-              >
-                <ThumbUpIcon />
-              </Button>
-            </>
-          )}
           <Typography fontSize={14} variant="h6">
             {`${post.comments.length} Comment${
               post.comments.length > 1 ? "s" : ""

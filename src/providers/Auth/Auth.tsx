@@ -31,8 +31,8 @@ const AuthProvider = ({
   useEffect(() => {
     const token = getToken();
     if (token) {
-      setLoggedIn(true);
       (client as any).link.options.headers.authorization = token;
+      setLoggedIn(true);
     }
   }, [location, getToken]);
 
