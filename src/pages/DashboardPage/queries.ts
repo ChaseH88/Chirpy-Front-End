@@ -36,6 +36,7 @@ export const GET_DASHBOARD_POSTS = gql`
         postedBy {
           id
           username
+          photo
         }
         content
         comments {

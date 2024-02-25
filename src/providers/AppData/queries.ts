@@ -10,6 +10,7 @@ export const CURRENT_USER_QUERY = gql`
       firstName
       lastName
       bio
+      photo
       posts {
         id
         content

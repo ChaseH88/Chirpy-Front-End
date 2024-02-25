@@ -72,6 +72,34 @@ export const Post = ({
 
   return (
     <PostContainer>
+      {currentUser?.id === post.postedBy.id && (
+        <Box
+          mr={1}
+          position="absolute"
+          top={-15}
+          right={-20}
+          display="flex"
+          alignItems="center"
+          p={1}
+          borderRadius={2}
+          sx={{
+            background: "#bce5fa",
+          }}
+        >
+          <>
+            <UserProfilePhoto
+              icon={post.postedBy.photo as any}
+              width={18}
+              height={18}
+              svgHeight={12}
+              svgWidth={12}
+            />
+            <Typography variant="body2" ml={1}>
+              {post.postedBy.username}
+            </Typography>
+          </>
+        </Box>
+      )}
       <Box
         className="content"
         p={2}
