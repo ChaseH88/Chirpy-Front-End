@@ -3,15 +3,12 @@ import { CommentInterface, PostModelInterface } from "../../types/interfaces";
 import { Form, FormInput } from "../Form";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@apollo/client";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import { CREATE_POST_COMMENT_MUTATION } from "./mutations";
 import { useAppData } from "../../hooks/useAppData";
 import { useState } from "react";
 import { GET_DASHBOARD_POSTS } from "../../pages/DashboardPage/queries";
 import { PostContainer } from "./styled";
 import moment from "moment";
-import { CommentItem } from "./CommentItem";
 import { Comments } from "./Comments";
 import { UserProfilePhoto } from "../UserProfilePhoto";
 import { LikeDislikeButtons } from "../LikeDislikeButtons/LikeDislikeButtons";
@@ -154,6 +151,7 @@ export const Post = ({
           onSubmit={handleCreatePostComment}
           submitText="Comment"
           formHook={formHook}
+          isLoading={createPostCommentLoading}
         />
       ) : (
         <>

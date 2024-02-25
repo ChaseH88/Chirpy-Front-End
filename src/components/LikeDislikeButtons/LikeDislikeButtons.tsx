@@ -8,6 +8,7 @@ import { LIKE_POST_MUTATION, DISLIKE_POST_MUTATION } from "./mutations";
 import { useAppData } from "../../hooks/useAppData";
 import { GET_DASHBOARD_POSTS } from "../../pages/DashboardPage/queries";
 import { PostModelInterface } from "../../types/interfaces";
+import { useSnackbar } from "notistack";
 
 export interface LikeDislikeButtonsProps
   extends Pick<PostModelInterface, "likes" | "dislikes" | "postedBy" | "id"> {}
@@ -25,9 +26,10 @@ export const LikeDislikeButtons = ({
   );
 
   const { currentUser } = useAppData();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleLikePost = async () => {
-    await likePost({
+    const res = await likePost({
       variables: {
         data: {
           postId,
@@ -36,10 +38,13 @@ export const LikeDislikeButtons = ({
       },
       refetchQueries: [{ query: GET_DASHBOARD_POSTS }],
     });
+    if (res?.data?.likePost) {
+      enqueueSnackbar(res.data.likePost, { variant: "success" });
+    }
   };
 
   const handleDislikePost = async () => {
-    await dislikePost({
+    const res = await dislikePost({
       variables: {
         data: {
           postId,
@@ -48,6 +53,9 @@ export const LikeDislikeButtons = ({
       },
       refetchQueries: [{ query: GET_DASHBOARD_POSTS }],
     });
+    if (res?.data?.dislikePost) {
+      enqueueSnackbar(res.data.dislikePost, { variant: "success" });
+    }
   };
 
   const hasLikedPost = likes.some(
@@ -68,9 +76,9 @@ export const LikeDislikeButtons = ({
             onClick={() =>
               currentUser!.id !== postedBy.id && handleDislikePost()
             }
-            disabled={dislikePostLoading}
+            disabled={dislikePostLoading || currentUserOwnsPost}
             sx={{
-              ...(!currentUserOwnsPost && { cursor: "pointer" }),
+              cursor: currentUserOwnsPost ? "default" : "pointer",
               padding: 1,
               width: 20,
               height: 20,
@@ -97,9 +105,9 @@ export const LikeDislikeButtons = ({
             variant="text"
             color="primary"
             onClick={() => !currentUserOwnsPost && handleLikePost()}
-            disabled={likePostLoading}
+            disabled={likePostLoading || currentUserOwnsPost}
             sx={{
-              ...(!currentUserOwnsPost && { cursor: "pointer" }),
+              cursor: currentUserOwnsPost ? "default" : "pointer",
               padding: 1,
               width: 20,
               height: 20,

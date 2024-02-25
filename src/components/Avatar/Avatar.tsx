@@ -2,18 +2,8 @@ import { Box, Button, Typography } from "@mui/material";
 import { UserModelInterface } from "../../types/interfaces";
 import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
-
-import EarthIcon from "@mui/icons-material/Public";
-import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
-import AcUnitIcon from "@mui/icons-material/AcUnit";
-import SportsFootballIcon from "@mui/icons-material/SportsFootball";
-import SportsBasketballIcon from "@mui/icons-material/SportsBasketball";
-import SportsScoreIcon from "@mui/icons-material/SportsScore";
-import FlightIcon from "@mui/icons-material/Flight";
-import HikingIcon from "@mui/icons-material/Hiking";
-import PersonIcon from "@mui/icons-material/Person";
 import { useAuth } from "../../hooks/useAuth";
-import { UserProfilePhoto } from "../UserProfilePhoto";
+import { IconType, UserProfilePhoto } from "../UserProfilePhoto";
 
 interface AvatarProps {
   user: UserModelInterface;
@@ -25,27 +15,9 @@ interface AvatarProps {
   }[];
 }
 
-export const icons = {
-  earth: <EarthIcon />,
-  smile: <EmojiEmotionsIcon />,
-  snowflake: <AcUnitIcon />,
-  football: <SportsFootballIcon />,
-  basketball: <SportsBasketballIcon />,
-  racing: <SportsScoreIcon />,
-  airplane: <FlightIcon />,
-  hiking: <HikingIcon />,
-  person: <PersonIcon />,
-};
-
-export type IconType = keyof typeof icons;
-
 export const Avatar = ({ user, buttons }: AvatarProps) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const Icon = useMemo(
-    () => icons[(user.photo as IconType) || "person"],
-    [user.photo]
-  );
 
   const _buttons = useMemo(
     () => [

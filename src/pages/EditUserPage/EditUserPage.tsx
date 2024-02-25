@@ -1,15 +1,15 @@
 import { useMutation } from "@apollo/client";
 import { useAppData } from "../../hooks/useAppData";
-import { useAuth } from "../../hooks/useAuth";
 import { Form, FormInput } from "../../components/Form";
 import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useEffect } from "react";
 import { Avatar } from "../../components/Avatar";
 import { EDIT_USER_MUTATION } from "./mutations";
 import { UserModelInterface } from "../../types/interfaces";
-import { icons } from "../../components/Avatar";
+import { icons } from "../../components/UserProfilePhoto";
+import { useSnackbar } from "notistack";
 
 type FormDataType = {
   username: string;
@@ -20,7 +20,8 @@ type FormDataType = {
 };
 
 const EditUserPage = () => {
-  const [editUser, { loading: editUserLoading, error: editUserError }] =
+  const { enqueueSnackbar } = useSnackbar();
+  const [editUser, { loading: editUserLoading }] =
     useMutation(EDIT_USER_MUTATION);
 
   const { currentUser, setCurrentUser } = useAppData();
@@ -39,22 +40,27 @@ const EditUserPage = () => {
   }, [currentUser, formHook]);
 
   const handleSubmit = async (data: FormDataType) => {
-    if (!data.username) {
-      alert("Please fill out all fields");
-      return;
-    }
+    try {
+      if (!data.username) {
+        alert("Please fill out all fields");
+        return;
+      }
 
-    const res = (await editUser({
-      variables: {
-        id: currentUser!.id,
-        data,
-      },
-    })) as {
-      data: {
-        editUser: UserModelInterface;
+      const res = (await editUser({
+        variables: {
+          id: currentUser!.id,
+          data,
+        },
+      })) as {
+        data: {
+          editUser: UserModelInterface;
+        };
       };
-    };
-    setCurrentUser(res.data.editUser);
+      setCurrentUser(res.data.editUser);
+      enqueueSnackbar("Profile updated", { variant: "success" });
+    } catch (error) {
+      enqueueSnackbar("Something went wrong", { variant: "error" });
+    }
   };
 
   const inputs: FormInput[] = [

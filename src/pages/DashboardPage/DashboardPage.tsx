@@ -6,12 +6,14 @@ import { CREATE_POST_MUTATION } from "./mutations";
 import { Form, FormInput } from "../../components/Form";
 import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { PostModelInterface } from "../../types/interfaces";
 import { Avatar } from "../../components/Avatar";
 import { Trending } from "../../components/Trending";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSnackbar } from "notistack";
+
+const POST_LIMIT = 20;
 
 const DashboardPage = () => {
   const [nextToken, setNextToken] = useState(0);
@@ -22,7 +24,7 @@ const DashboardPage = () => {
   } = useQuery(GET_DASHBOARD_POSTS, {
     variables: {
       nextToken: 0,
-      limit: 10,
+      limit: POST_LIMIT,
     },
   });
   const [createPost, { loading: createPostLoading }] =
@@ -34,8 +36,8 @@ const DashboardPage = () => {
     },
     reValidateMode: "onChange",
   });
-  const navigate = useNavigate();
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleSubmit = async (data: PostModelInterface) => {
     if (!data.content) {
@@ -46,7 +48,6 @@ const DashboardPage = () => {
       variables: {
         data: {
           content: data.content,
-          postedBy: currentUser!.id,
         },
       },
       refetchQueries: [
@@ -54,11 +55,13 @@ const DashboardPage = () => {
           query: GET_DASHBOARD_POSTS,
           variables: {
             nextToken,
-            limit: 10,
+            limit: POST_LIMIT,
           },
         },
       ],
     });
+    enqueueSnackbar("Post created", { variant: "success" });
+    formHook.reset();
   };
 
   const handleLoadMore = useCallback(() => {
@@ -66,7 +69,7 @@ const DashboardPage = () => {
       fetchMore({
         variables: {
           nextToken: parseInt(data.allPosts.nextToken),
-          limit: 10,
+          limit: POST_LIMIT,
         },
         updateQuery: (prev, { fetchMoreResult }) => {
           if (!fetchMoreResult) return prev;

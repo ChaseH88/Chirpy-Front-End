@@ -1,6 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
-import { UserModelInterface } from "../../types/interfaces";
-import { useNavigate } from "react-router-dom";
+import { Box } from "@mui/material";
 import { useMemo } from "react";
 
 import EarthIcon from "@mui/icons-material/Public";
@@ -12,7 +10,6 @@ import SportsScoreIcon from "@mui/icons-material/SportsScore";
 import FlightIcon from "@mui/icons-material/Flight";
 import HikingIcon from "@mui/icons-material/Hiking";
 import PersonIcon from "@mui/icons-material/Person";
-import { useAuth } from "../../hooks/useAuth";
 
 export const icons = {
   earth: <EarthIcon />,
