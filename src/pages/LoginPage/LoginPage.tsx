@@ -7,6 +7,7 @@ import { UserModelInterface } from "../../types/interfaces";
 import { useAuth } from "../../hooks/useAuth";
 import { HomeLayout } from "../../components/HomeLayout";
 import { Box, Button } from "@mui/material";
+import { useSnackbar } from "notistack";
 
 type FormDataType = {
   username: string;
@@ -22,8 +23,9 @@ const LoginPage = () => {
     reValidateMode: "onChange",
   });
   const navigate = useNavigate();
-  const [loginUser, { loading, error }] = useMutation(LOGIN_MUTATION);
+  const [loginUser, { loading }] = useMutation(LOGIN_MUTATION);
   const { login } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleSubmit = async (data: FormDataType) => {
     try {
@@ -43,8 +45,10 @@ const LoginPage = () => {
       };
 
       login(res.data.login.token);
-    } catch (err) {
-      console.log(error?.message);
+    } catch {
+      enqueueSnackbar("Invalid username or password", {
+        variant: "error",
+      });
     }
   };
 
@@ -73,6 +77,7 @@ const LoginPage = () => {
           onSubmit={handleSubmit}
           submitText="Login"
           formHook={formHook}
+          isLoading={loading}
         />
       )}
       MenuComponent={() => (
