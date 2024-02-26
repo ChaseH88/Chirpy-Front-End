@@ -65,6 +65,7 @@ export const LikeDislikeButtons = ({
     (dislike) => dislike.username === currentUser?.username
   );
   const currentUserOwnsPost = currentUser?.id === postedBy.id;
+  const isLoading = likePostLoading || dislikePostLoading;
 
   return (
     <Box>
@@ -74,9 +75,9 @@ export const LikeDislikeButtons = ({
             variant="text"
             color="secondary"
             onClick={() =>
-              currentUser!.id !== postedBy.id && handleDislikePost()
+              (!currentUserOwnsPost || !isLoading) && handleDislikePost()
             }
-            disabled={dislikePostLoading || currentUserOwnsPost}
+            disabled={isLoading || currentUserOwnsPost}
             sx={{
               cursor: currentUserOwnsPost ? "default" : "pointer",
               padding: 1,
@@ -104,8 +105,10 @@ export const LikeDislikeButtons = ({
           <Button
             variant="text"
             color="primary"
-            onClick={() => !currentUserOwnsPost && handleLikePost()}
-            disabled={likePostLoading || currentUserOwnsPost}
+            onClick={() =>
+              (!currentUserOwnsPost || !isLoading) && handleLikePost()
+            }
+            disabled={isLoading || currentUserOwnsPost}
             sx={{
               cursor: currentUserOwnsPost ? "default" : "pointer",
               padding: 1,
