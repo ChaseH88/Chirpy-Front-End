@@ -6,12 +6,14 @@ import { CREATE_POST_MUTATION } from "./mutations";
 import { Form, FormInput } from "../../components/Form";
 import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { PostModelInterface } from "../../types/interfaces";
 import { Avatar } from "../../components/Avatar";
 import { Trending } from "../../components/Trending";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSnackbar } from "notistack";
+import { Editor } from "../../components/Editor";
+import { CURRENT_USER_QUERY } from "../../providers/AppData/queries";
 
 const POST_LIMIT = 20;
 
@@ -57,6 +59,9 @@ const DashboardPage = () => {
             nextToken,
             limit: POST_LIMIT,
           },
+        },
+        {
+          query: CURRENT_USER_QUERY,
         },
       ],
     });
@@ -132,14 +137,35 @@ const DashboardPage = () => {
       PostsComponent={() => (
         <Box>
           <Box mb={5} borderBottom={1} borderColor="primary.main" pb={5}>
-            <Box borderRadius={2} overflow={"hidden"} mx={3}>
-              <Form<PostModelInterface>
-                inputs={inputs}
-                onSubmit={handleSubmit}
-                submitText="Post"
-                formHook={formHook}
-                buttonPosition="right"
-              />
+            <Box
+              borderRadius={2}
+              overflow={"hidden"}
+              mx={3}
+              sx={{
+                backgroundColor: "white",
+              }}
+            >
+              {createPostLoading ? (
+                <CircularProgress variant="indeterminate" color="secondary" />
+              ) : (
+                <Editor
+                  content={formHook.getValues("content")}
+                  onChange={(content) => formHook.setValue("content", content)}
+                  sx={{
+                    padding: 3,
+                  }}
+                />
+              )}
+              <Box p={2} display="flex" justifyContent="flex-end">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={formHook.handleSubmit(handleSubmit as any)}
+                  disabled={createPostLoading}
+                >
+                  Post
+                </Button>
+              </Box>
             </Box>
           </Box>
           <Box px={4} py={2}>
