@@ -46,7 +46,7 @@ const AppDataProvider = ({
     error: currentUserError,
   } = useQuery(CURRENT_USER_QUERY, {
     variables: { token: getToken() },
-    skip: !isLoggedIn && getToken() !== null,
+    skip: !isLoggedIn,
     defaultOptions: {
       fetchPolicy: "network-only",
     },

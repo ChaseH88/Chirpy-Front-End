@@ -12,6 +12,7 @@ import moment from "moment";
 import { Comments } from "./Comments";
 import { UserProfilePhoto } from "../UserProfilePhoto";
 import { LikeDislikeButtons } from "../LikeDislikeButtons/LikeDislikeButtons";
+import { useNavigate } from "react-router-dom";
 
 export interface PostProps {
   post: PostModelInterface;
@@ -33,7 +34,7 @@ export const Post = ({
   });
   const [createPostComment, { loading: createPostCommentLoading }] =
     useMutation(CREATE_POST_COMMENT_MUTATION);
-
+  const navigate = useNavigate();
   const { currentUser } = useAppData();
 
   const handleCreatePostComment = async (data: CommentInterface) => {
@@ -57,7 +58,6 @@ export const Post = ({
     });
     setCommentOn(false);
   };
-
   const toggleCommentBox = () => setCommentOn(!commentOn);
 
   const inputs: FormInput[] = [
@@ -164,14 +164,30 @@ export const Post = ({
             }`}
           </Typography>
         </Box>
-        <Button
-          size="small"
-          variant="contained"
-          color="primary"
-          onClick={toggleCommentBox}
-        >
-          {commentOn ? "Cancel" : "Comment"}
-        </Button>
+        <Box display="flex" gap={1}>
+          <Button
+            size="small"
+            variant="outlined"
+            color="primary"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/post/${post.id}`);
+            }}
+          >
+            See Post
+          </Button>
+          <Button
+            size="small"
+            variant="outlined"
+            color="primary"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleCommentBox();
+            }}
+          >
+            {commentOn ? "Cancel" : "Comment"}
+          </Button>
+        </Box>
       </Box>
       {commentOn ? (
         <Form<CommentInterface>
