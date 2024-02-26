@@ -13,6 +13,7 @@ import { Comments } from "./Comments";
 import { UserProfilePhoto } from "../UserProfilePhoto";
 import { LikeDislikeButtons } from "../LikeDislikeButtons/LikeDislikeButtons";
 import { useNavigate } from "react-router-dom";
+import { ActionMenu } from "../ActionMenu";
 
 export interface PostProps {
   post: PostModelInterface;
@@ -82,6 +83,8 @@ export const Post = ({
           alignItems="center"
           p={1}
           borderRadius={2}
+          borderColor={"primary.main"}
+          border={1}
           sx={{
             background: "#bce5fa",
           }}
@@ -97,6 +100,24 @@ export const Post = ({
             <Typography variant="body2" ml={1}>
               {post.postedBy.username}
             </Typography>
+            <ActionMenu
+              items={[
+                {
+                  onClick: () => navigate(`/post/${post.id}`),
+                  text: "See Post",
+                },
+                {
+                  onClick: () => console.log("delete"),
+                  text: "Delete",
+                },
+              ]}
+              sx={{
+                ml: 1,
+                "& button": {
+                  border: "none",
+                },
+              }}
+            />
           </>
         </Box>
       )}
