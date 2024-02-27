@@ -15,7 +15,7 @@ import { useSnackbar } from "notistack";
 import { Editor } from "../../components/Editor";
 import { CURRENT_USER_QUERY } from "../../providers/AppData/queries";
 
-const POST_LIMIT = 20;
+export const POST_LIMIT = 20;
 
 const DashboardPage = () => {
   const [nextToken, setNextToken] = useState(0);
@@ -23,6 +23,7 @@ const DashboardPage = () => {
     loading: getPostLoading,
     data,
     fetchMore,
+    refetch,
   } = useQuery(GET_DASHBOARD_POSTS, {
     variables: {
       nextToken: 0,
@@ -40,6 +41,15 @@ const DashboardPage = () => {
   });
   const bottomRef = useRef<HTMLDivElement>(null);
   const { enqueueSnackbar } = useSnackbar();
+
+  const refreshPosts = useCallback(async () => {
+    refetch({
+      variables: {
+        nextToken: nextToken || 0,
+        limit: POST_LIMIT,
+      },
+    });
+  }, [refetch, nextToken]);
 
   const handleSubmit = async (data: PostModelInterface) => {
     if (!data.content) {
@@ -122,16 +132,6 @@ const DashboardPage = () => {
     };
   }, [data, handleLoadMore]);
 
-  const inputs: FormInput[] = [
-    {
-      name: "content",
-      type: "text",
-      placeholder: "Enter your post",
-      required: true,
-      label: "Post",
-    },
-  ];
-
   return (
     <DashboardLayout
       PostsComponent={() => (
@@ -144,6 +144,7 @@ const DashboardPage = () => {
               sx={{
                 backgroundColor: "white",
               }}
+              height={200}
             >
               {createPostLoading ? (
                 <CircularProgress variant="indeterminate" color="secondary" />
@@ -152,7 +153,8 @@ const DashboardPage = () => {
                   content={formHook.getValues("content")}
                   onChange={(content) => formHook.setValue("content", content)}
                   sx={{
-                    padding: 3,
+                    px: 3,
+                    pt: 3,
                   }}
                 />
               )}
@@ -193,7 +195,12 @@ const DashboardPage = () => {
               <CircularProgress variant="indeterminate" color="secondary" />
             ) : (
               <>
-                <Posts posts={data?.allPosts?.items} commentsToShow={3} />
+                <Posts
+                  posts={data?.allPosts?.items}
+                  commentsToShow={3}
+                  onCreatePostComment={refreshPosts}
+                  onDeletePost={refreshPosts}
+                />
                 {data?.allPosts?.nextToken && <Box ref={bottomRef} />}
               </>
             )}

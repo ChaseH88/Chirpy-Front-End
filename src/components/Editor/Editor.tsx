@@ -27,7 +27,23 @@ export const Editor = ({
     <Box sx={{ ...sx }}>
       {editor && (
         <>
-          <EditorContent editor={editor} className="editor-content" />
+          <Box
+            sx={{
+              "& .editor-content": {
+                height: "100%",
+                padding: "0 10px",
+                border: "1px solid #ccc",
+                borderRadius: "5px",
+                outline: "none",
+                "& > .tiptap": {
+                  padding: "10px",
+                  outline: "none",
+                },
+              },
+            }}
+          >
+            <EditorContent editor={editor} className="editor-content" />
+          </Box>
           <MenuBar editor={editor} />
         </>
       )}

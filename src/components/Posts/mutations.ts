@@ -5,3 +5,9 @@ export const CREATE_POST_COMMENT_MUTATION = gql`
     createPostComment(data: $data)
   }
 `;
+
+export const DELETE_POST_MUTATION = gql`
+  mutation DeletePost($id: ID!) {
+    deletePost(id: $id)
+  }
+`;

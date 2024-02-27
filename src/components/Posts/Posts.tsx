@@ -3,42 +3,34 @@ import { PostModelInterface } from "../../types/interfaces";
 import { Post, PostProps } from "./Post";
 
 interface PostsProps
-  extends Pick<PostProps, "OverrideCommentButton" | "commentsToShow"> {
+  extends Pick<
+    PostProps,
+    | "OverrideCommentButton"
+    | "commentsToShow"
+    | "onDeletePost"
+    | "onCreatePostComment"
+  > {
   posts: PostModelInterface[];
   headingText?: string;
 }
 
-export const Posts = ({
-  posts,
-  headingText,
-  OverrideCommentButton,
-  commentsToShow,
-}: PostsProps) => {
-  return (
-    <Stack>
-      {headingText && (
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            {headingText}
-          </Typography>
-        </Box>
-      )}
+export const Posts = ({ posts, headingText, ...rest }: PostsProps) => (
+  <Stack>
+    {headingText && (
       <Box>
-        {posts?.length ? (
-          posts?.map((post) => (
-            <Post
-              key={post.id}
-              post={post}
-              OverrideCommentButton={OverrideCommentButton}
-              commentsToShow={commentsToShow}
-            />
-          ))
-        ) : (
-          <Typography variant="h5" gutterBottom>
-            No posts to show
-          </Typography>
-        )}
+        <Typography variant="h4" gutterBottom>
+          {headingText}
+        </Typography>
       </Box>
-    </Stack>
-  );
-};
+    )}
+    <Box>
+      {posts?.length ? (
+        posts?.map((post) => <Post key={post.id} post={post} {...rest} />)
+      ) : (
+        <Typography variant="h5" gutterBottom>
+          No posts to show
+        </Typography>
+      )}
+    </Box>
+  </Stack>
+);

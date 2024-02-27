@@ -1,9 +1,12 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, LinearProgress, Typography } from "@mui/material";
 import { CommentInterface, PostModelInterface } from "../../types/interfaces";
 import { Form, FormInput } from "../Form";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@apollo/client";
-import { CREATE_POST_COMMENT_MUTATION } from "./mutations";
+import {
+  CREATE_POST_COMMENT_MUTATION,
+  DELETE_POST_MUTATION,
+} from "./mutations";
 import { useAppData } from "../../hooks/useAppData";
 import { useState } from "react";
 import { GET_DASHBOARD_POSTS } from "../../pages/DashboardPage/queries";
@@ -14,17 +17,23 @@ import { UserProfilePhoto } from "../UserProfilePhoto";
 import { LikeDislikeButtons } from "../LikeDislikeButtons/LikeDislikeButtons";
 import { useNavigate } from "react-router-dom";
 import { ActionMenu } from "../ActionMenu";
+import { useSnackbar } from "notistack";
+import { POST_LIMIT } from "../../pages/DashboardPage";
 
 export interface PostProps {
   post: PostModelInterface;
   OverrideCommentButton?: React.ReactNode;
   commentsToShow: number;
+  onDeletePost?: () => void;
+  onCreatePostComment?: () => void;
 }
 
 export const Post = ({
   post,
   OverrideCommentButton,
   commentsToShow,
+  onDeletePost,
+  onCreatePostComment,
 }: PostProps) => {
   const [commentOn, setCommentOn] = useState(false);
   const formHook = useForm({
@@ -37,13 +46,16 @@ export const Post = ({
     useMutation(CREATE_POST_COMMENT_MUTATION);
   const navigate = useNavigate();
   const { currentUser } = useAppData();
+  const [deletePost, { loading: deletePostLoading }] =
+    useMutation(DELETE_POST_MUTATION);
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleCreatePostComment = async (data: CommentInterface) => {
     if (!data.comment) {
       alert("Please fill out all fields");
       return;
     }
-    await createPostComment({
+    const res = await createPostComment({
       variables: {
         data: {
           postId: post.id,
@@ -51,15 +63,26 @@ export const Post = ({
           comment: data.comment,
         },
       },
-      refetchQueries: [
-        {
-          query: GET_DASHBOARD_POSTS,
-        },
-      ],
+    });
+    onCreatePostComment?.();
+    enqueueSnackbar(res.data.createPostComment, {
+      variant: "success",
     });
     setCommentOn(false);
   };
   const toggleCommentBox = () => setCommentOn(!commentOn);
+
+  const handleDeletePost = async (id: string) => {
+    const res = await deletePost({
+      variables: {
+        id,
+      },
+    });
+    onDeletePost?.();
+    enqueueSnackbar(res.data.deletePost, {
+      variant: "success",
+    });
+  };
 
   const inputs: FormInput[] = [
     {
@@ -73,6 +96,35 @@ export const Post = ({
 
   return (
     <PostContainer>
+      {deletePostLoading && (
+        <Box
+          justifyContent={"center"}
+          display={"flex"}
+          flexDirection={"column"}
+          gap={2}
+          position="absolute"
+          sx={{
+            width: "100%",
+            height: "100%",
+            background: "rgba(255, 255, 255, 0.75)",
+            zIndex: 1000,
+            top: 0,
+            left: 0,
+            alignItems: "center",
+          }}
+        >
+          <Typography mb={1} variant="h6" fontWeight={700}>
+            Deleting Post...
+          </Typography>
+          <LinearProgress
+            color="success"
+            sx={{
+              height: 5,
+              width: "80%",
+            }}
+          />
+        </Box>
+      )}
       {currentUser?.id === post.postedBy.id && (
         <Box
           mr={1}
@@ -107,7 +159,7 @@ export const Post = ({
                   text: "See Post",
                 },
                 {
-                  onClick: () => console.log("delete"),
+                  onClick: () => handleDeletePost(post.id),
                   text: "Delete",
                 },
               ]}
