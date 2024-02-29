@@ -24,20 +24,26 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
       {
         variant: "text",
         color: "primary",
+        text: "Search",
+        onClick: () => navigate("/search"),
+      },
+      {
+        variant: "text",
+        color: "primary",
         text: "Your Posts",
-        onClick: () => navigate("/user-posts"),
+        onClick: () => navigate("/dashboard"),
       },
       {
         variant: "text",
         color: "primary",
         text: "All Posts",
-        onClick: () => navigate("/all-posts"),
+        onClick: () => navigate("/dashboard"),
       },
       {
         variant: "text",
         color: "primary",
         text: "Trending Posts",
-        onClick: () => navigate("/trending-posts"),
+        onClick: () => navigate("/dashboard"),
       },
       {
         variant: "text",

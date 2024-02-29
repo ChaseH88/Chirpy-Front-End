@@ -4,7 +4,7 @@ import {
   InMemoryCache,
 } from "@apollo/client";
 
-const BASE_URL = "http://192.168.4.29:4000/graphql";
+const BASE_URL = "http://localhost:4000/graphql";
 
 export const client = new ApolloClient({
   cache: new InMemoryCache(),
