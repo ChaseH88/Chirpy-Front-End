@@ -66,8 +66,8 @@ const AppDataProvider = ({
   };
 
   useEffect(() => {
-    if (data && data.currentUser) {
-      setCurrentUser(data.currentUser);
+    if (data && data?.currentUser?.user) {
+      setCurrentUser(data.currentUser.user);
     }
   }, [data]);
 

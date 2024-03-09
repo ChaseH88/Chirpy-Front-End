@@ -1,6 +1,6 @@
-import { Navigate } from 'react-router-dom';
-import { useAppData } from '../../hooks/useAppData';
-import { useAuth } from '../../hooks/useAuth';
+import { Navigate } from "react-router-dom";
+import { useAppData } from "../../hooks/useAppData";
+import { useAuth } from "../../hooks/useAuth";
 
 const ProtectedRoute = ({
   children,

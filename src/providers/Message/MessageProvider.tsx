@@ -3,6 +3,7 @@ import { UserModelInterface } from "../../types/interfaces";
 import { useSubscription } from "@apollo/client";
 import { MESSAGE_SUBSCRIPTION } from "./subscription";
 import { useAuth } from "../../hooks/useAuth";
+import { useSnackbar } from "notistack";
 
 export interface MessageInterface {
   fromId: string;
@@ -29,11 +30,18 @@ const MessageProvider = ({
   children: React.ReactNode;
 }): JSX.Element => {
   const { isLoggedIn } = useAuth();
-  const { data, error } = useSubscription(MESSAGE_SUBSCRIPTION, {
+  const { enqueueSnackbar } = useSnackbar();
+  const { data } = useSubscription(MESSAGE_SUBSCRIPTION, {
     skip: !isLoggedIn,
   });
-  console.log("data", data);
-  console.log("error", error);
+
+  useEffect(() => {
+    if (data?.messageSent) {
+      enqueueSnackbar(`message from ${data?.messageSent?.fromId.username}`, {
+        variant: "success",
+      });
+    }
+  }, [enqueueSnackbar, data]);
 
   return (
     <MessageContext.Provider

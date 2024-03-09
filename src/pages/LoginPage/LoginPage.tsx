@@ -33,7 +33,6 @@ const LoginPage = () => {
         alert("Please fill out all fields");
         return;
       }
-      console.log("data", data);
       const res = (await loginUser({
         variables: data,
       })) as {

@@ -5,28 +5,42 @@ import {
   HttpLink,
   from,
   ApolloLink,
+  split,
 } from "@apollo/client";
 import { auth } from "./auth";
 import { BASE_URL } from "./constants";
 import { link as socketLink } from "./SSELink";
+import { getMainDefinition } from "@apollo/client/utilities";
 
 const httpLink = new HttpLink({ uri: `http://${BASE_URL}/graphql` });
 const authMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext({
-    headers: auth,
+    headers: {
+      ...auth(),
+    },
   });
   return forward(operation);
 });
 
-const httpLinkWithMiddleware = from([authMiddleware, socketLink, httpLink]);
+const httpLinkWithMiddleware = from([authMiddleware, httpLink]);
 
-// Apollo Client setup
+const link = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    );
+  },
+  socketLink,
+  httpLinkWithMiddleware
+);
+
 export const client = new ApolloClient({
-  link: httpLinkWithMiddleware,
+  link,
   cache: new InMemoryCache(),
 });
 
-// ApolloProvider component
 const ApolloProvider = ({
   children,
 }: {
