@@ -3,7 +3,6 @@ import { GET_DASHBOARD_POSTS } from "./queries";
 import { useAppData } from "../../hooks/useAppData";
 import { Posts } from "../../components/Posts/Posts";
 import { CREATE_POST_MUTATION } from "./mutations";
-import { Form, FormInput } from "../../components/Form";
 import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
@@ -14,6 +13,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useSnackbar } from "notistack";
 import { Editor } from "../../components/Editor";
 import { CURRENT_USER_QUERY } from "../../providers/AppData/queries";
+import { useEditor } from "@tiptap/react";
+import { extensions } from "../../components/Editor/extensions";
 
 export const POST_LIMIT = 20;
 
@@ -41,6 +42,18 @@ const DashboardPage = () => {
   });
   const bottomRef = useRef<HTMLDivElement>(null);
   const { enqueueSnackbar } = useSnackbar();
+  const editor = useEditor(
+    {
+      extensions,
+      content: "",
+      onUpdate({ editor }) {
+        // const content = editor.getHTML() || "";
+        // formHook.setValue("content", content);
+        // editor.commands.setContent(content);
+      },
+    },
+    []
+  );
 
   const refreshPosts = useCallback(async () => {
     refetch({
@@ -146,18 +159,13 @@ const DashboardPage = () => {
               }}
               height={200}
             >
-              {createPostLoading ? (
-                <CircularProgress variant="indeterminate" color="secondary" />
-              ) : (
-                <Editor
-                  content={formHook.getValues("content")}
-                  onChange={(content) => formHook.setValue("content", content)}
-                  sx={{
-                    px: 3,
-                    pt: 3,
-                  }}
-                />
-              )}
+              <Editor
+                editor={editor!}
+                sx={{
+                  px: 3,
+                  pt: 3,
+                }}
+              />
               <Box p={2} display="flex" justifyContent="flex-end">
                 <Button
                   variant="contained"
