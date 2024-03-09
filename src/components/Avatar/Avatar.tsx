@@ -24,6 +24,12 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
       {
         variant: "text",
         color: "primary",
+        text: "Messages",
+        onClick: () => navigate("/messages"),
+      },
+      {
+        variant: "text",
+        color: "primary",
         text: "Your Posts",
         onClick: () => navigate("/user-posts"),
       },

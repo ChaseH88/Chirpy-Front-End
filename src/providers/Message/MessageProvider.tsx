@@ -6,11 +6,12 @@ import { useSnackbar } from "notistack";
 import { useAppData } from "../../hooks/useAppData";
 import { createContext } from "react";
 import { SEND_MESSAGE_MUTATION } from "./mutations";
+import { CURRENT_USER_QUERY } from "../AppData/queries";
 
 export interface MessageContextInterface {
   messages?: MessageModelInterface[];
   sendMessageMutation: (
-    input: Pick<MessageModelInterface, "content" | "toId">
+    input: Pick<MessageModelInterface, "content"> & { toId: string }
   ) => Promise<
     | FetchResult<{
         data: {
@@ -45,7 +46,7 @@ const MessageProvider = ({
   const [sendMessage] = useMutation(SEND_MESSAGE_MUTATION);
 
   const sendMessageMutation = async (
-    input: Pick<MessageModelInterface, "content" | "toId">
+    input: Pick<MessageModelInterface, "content"> & { toId: string }
   ) => {
     try {
       return await sendMessage({
@@ -55,6 +56,7 @@ const MessageProvider = ({
             type: "PRIVATE",
           },
         },
+        refetchQueries: [CURRENT_USER_QUERY],
       });
     } catch (error) {
       console.error(error);

@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { Container } from "./styled";
 
 interface DashboardLayoutProps {
@@ -11,32 +11,18 @@ export const DashboardLayout = ({
   PostsComponent,
   AvatarComponent,
   TrendingComponent,
-}: DashboardLayoutProps) => (
-  <Container>
-    <Box
-      className="container"
-      display={"flex"}
-      flexWrap={"nowrap"}
-      alignItems={"flex-start"}
-      p={4}
-    >
+}: DashboardLayoutProps) => {
+  return (
+    <Container>
       <Box
-        className="left"
-        flex={"1 1 25%"}
+        className="container"
         display={"flex"}
-        alignItems={"center"}
-        justifyContent={"center"}
-        position={"sticky"}
-        top={"10%"}
+        flexWrap={"nowrap"}
+        alignItems={"flex-start"}
+        p={4}
       >
-        <AvatarComponent />
-      </Box>
-      <Box className="middle" flex={"1 1 50%"}>
-        <PostsComponent />
-      </Box>
-      {TrendingComponent && (
         <Box
-          className="right"
+          className="left"
           flex={"1 1 25%"}
           display={"flex"}
           alignItems={"center"}
@@ -44,9 +30,25 @@ export const DashboardLayout = ({
           position={"sticky"}
           top={"10%"}
         >
-          <TrendingComponent />
+          <AvatarComponent />
         </Box>
-      )}
-    </Box>
-  </Container>
-);
+        <Box className="middle" flex={"1 1 50%"}>
+          <PostsComponent />
+        </Box>
+        {TrendingComponent && (
+          <Box
+            className="right"
+            flex={"1 1 25%"}
+            display={"flex"}
+            alignItems={"center"}
+            justifyContent={"center"}
+            position={"sticky"}
+            top={"10%"}
+          >
+            <TrendingComponent />
+          </Box>
+        )}
+      </Box>
+    </Container>
+  );
+};

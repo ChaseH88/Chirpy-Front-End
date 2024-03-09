@@ -39,6 +39,6 @@ export interface MessageModelInterface {
   content: string;
   likes: UserModelInterface[];
   dislikes: UserModelInterface[];
-  createdAt: Date;
+  createdAt: string;
   updatedAt: Date;
 }

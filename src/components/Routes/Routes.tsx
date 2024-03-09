@@ -6,6 +6,7 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { useAuth } from "../../hooks/useAuth";
 import { EditUserPage } from "../../pages/EditUserPage";
 import { FindPostPage } from "../../pages/FindPostPage";
+import { MessagesPage } from "../../pages/MessagesPage";
 
 const Routes = (): JSX.Element => {
   const { isLoggedIn } = useAuth();
@@ -34,6 +35,14 @@ const Routes = (): JSX.Element => {
         element={
           <ProtectedRoute>
             <EditUserPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/messages"
+        element={
+          <ProtectedRoute>
+            <MessagesPage />
           </ProtectedRoute>
         }
       />
