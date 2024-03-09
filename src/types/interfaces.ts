@@ -30,3 +30,15 @@ export interface CommentInterface {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface MessageModelInterface {
+  id: string;
+  fromId: UserModelInterface;
+  toId: UserModelInterface;
+  type: "PRIVATE" | "GROUP";
+  content: string;
+  likes: UserModelInterface[];
+  dislikes: UserModelInterface[];
+  createdAt: Date;
+  updatedAt: Date;
+}

@@ -1,26 +1,16 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { UserModelInterface } from "../../types/interfaces";
+import { MessageModelInterface } from "../../types/interfaces";
 import { useSubscription } from "@apollo/client";
 import { MESSAGE_SUBSCRIPTION } from "./subscription";
 import { useAuth } from "../../hooks/useAuth";
 import { useSnackbar } from "notistack";
-
-export interface MessageInterface {
-  fromId: string;
-  toId: string;
-  type: "PRIVATE" | "GROUP";
-  content: string;
-  likes: UserModelInterface[];
-  dislikes: UserModelInterface[];
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { useAppData } from "../../hooks/useAppData";
+import { createContext } from "react";
 
 export interface MessageContextInterface {
-  messages?: MessageInterface[];
+  messages?: MessageModelInterface[];
 }
 
-export const MessageContext = React.createContext<
+export const MessageContext = createContext<
   MessageContextInterface | undefined
 >(undefined);
 
@@ -30,18 +20,15 @@ const MessageProvider = ({
   children: React.ReactNode;
 }): JSX.Element => {
   const { isLoggedIn } = useAuth();
+  const { addToMessagesAction } = useAppData();
   const { enqueueSnackbar } = useSnackbar();
-  const { data } = useSubscription(MESSAGE_SUBSCRIPTION, {
+  useSubscription(MESSAGE_SUBSCRIPTION, {
     skip: !isLoggedIn,
+    onData: ({ data: { data } }) => {
+      addToMessagesAction(data.messageSent);
+      enqueueSnackbar("New message received", { variant: "info" });
+    },
   });
-
-  useEffect(() => {
-    if (data?.messageSent) {
-      enqueueSnackbar(`message from ${data?.messageSent?.fromId.username}`, {
-        variant: "success",
-      });
-    }
-  }, [enqueueSnackbar, data]);
 
   return (
     <MessageContext.Provider

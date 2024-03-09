@@ -1,29 +1,56 @@
 import React, { useContext, useEffect, useReducer } from "react";
-import { UserModelInterface } from "../../types/interfaces";
+import {
+  MessageModelInterface,
+  UserModelInterface,
+} from "../../types/interfaces";
 import { StateContext as AuthStateContext } from "../Auth";
 import { useQuery } from "@apollo/client";
 import { CURRENT_USER_QUERY } from "./queries";
 import { normalizeGraphQLError } from "../../utilities/normalize-graphql-error";
 
+export interface CurrentUserInterface extends UserModelInterface {
+  messages: MessageModelInterface[];
+}
+
 export interface AppDataContext {
-  currentUser: UserModelInterface | null;
-  setCurrentUser: (user: UserModelInterface | null) => void;
+  currentUser: CurrentUserInterface | null;
+  setCurrentUser: (user: CurrentUserInterface | null) => void;
+  addToMessagesAction: (message: MessageModelInterface) => void;
   loading: boolean;
 }
 interface StateType {
-  currentUser: UserModelInterface | null;
+  currentUser: CurrentUserInterface | null;
 }
 
 const initialState: StateType = {
   currentUser: null,
 };
 
-type Actions = { type: "SET_CURRENT_USER"; payload: UserModelInterface | null };
+type Actions =
+  | {
+      type: "SET_CURRENT_USER";
+      payload: CurrentUserInterface | null;
+    }
+  | {
+      type: "ADD_TO_MESSAGES";
+      payload: MessageModelInterface;
+    };
 
 const reducer = (state: StateType, action: Actions): StateType => {
   switch (action.type) {
     case "SET_CURRENT_USER":
       return { ...state, currentUser: action.payload };
+    case "ADD_TO_MESSAGES":
+      if (state.currentUser) {
+        return {
+          ...state,
+          currentUser: {
+            ...state.currentUser,
+            messages: [...state.currentUser.messages, action.payload],
+          },
+        };
+      }
+      return state;
     default:
       throw new Error("Unhandled action type");
   }
@@ -61,13 +88,20 @@ const AppDataProvider = ({
     }
   }, [currentUserError, logout]);
 
-  const setCurrentUser = (user: UserModelInterface | null) => {
+  const setCurrentUser = (user: CurrentUserInterface | null) => {
     dispatch({ type: "SET_CURRENT_USER", payload: user });
+  };
+
+  const addToMessagesAction = (message: MessageModelInterface) => {
+    dispatch({ type: "ADD_TO_MESSAGES", payload: message });
   };
 
   useEffect(() => {
     if (data && data?.currentUser?.user) {
-      setCurrentUser(data.currentUser.user);
+      setCurrentUser({
+        ...data.currentUser.user,
+        messages: data.currentUser.messages,
+      });
     }
   }, [data]);
 
@@ -77,6 +111,7 @@ const AppDataProvider = ({
         currentUser: state.currentUser,
         setCurrentUser,
         loading: useQueryLoading,
+        addToMessagesAction,
       }}
     >
       {children}

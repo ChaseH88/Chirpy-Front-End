@@ -10,6 +10,7 @@ import { EDIT_USER_MUTATION } from "./mutations";
 import { UserModelInterface } from "../../types/interfaces";
 import { icons } from "../../components/UserProfilePhoto";
 import { useSnackbar } from "notistack";
+import { CurrentUserInterface } from "../../providers/AppData";
 
 type FormDataType = {
   username: string;
@@ -56,7 +57,7 @@ const EditUserPage = () => {
           editUser: UserModelInterface;
         };
       };
-      setCurrentUser(res.data.editUser);
+      setCurrentUser(res.data.editUser as CurrentUserInterface);
       enqueueSnackbar("Profile updated", { variant: "success" });
     } catch (error) {
       enqueueSnackbar("Something went wrong", { variant: "error" });
