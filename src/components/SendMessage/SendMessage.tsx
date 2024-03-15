@@ -2,18 +2,19 @@ import { Box } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { Form, FormInput } from "../Form";
 import { useMessages } from "../../hooks/useMessages";
+import { MessageModelInterface } from "../../types/interfaces";
 
-interface SendMessageProps {
-  toId: string;
-  username: string;
+export interface SendMessageProps {
+  message: MessageModelInterface;
+  onSendMessage?: () => void;
 }
 
-export const SendMessage = ({ toId, username }: SendMessageProps) => {
+export const SendMessage = ({ message, onSendMessage }: SendMessageProps) => {
   const { sendMessageMutation } = useMessages();
 
   const formHook = useForm({
     defaultValues: {
-      toId,
+      toId: message.fromId.id,
       content: "",
     },
     reValidateMode: "onChange",
@@ -24,21 +25,22 @@ export const SendMessage = ({ toId, username }: SendMessageProps) => {
       toId: data.toId,
       content: data.content,
     });
+    formHook.reset();
+    onSendMessage?.();
   };
 
   const inputs: FormInput[] = [
     {
       name: "content",
       type: "text",
-      placeholder: "Enter your message",
+      placeholder: `Send a message to ${message.fromId.username}...`,
       required: true,
-      label: "Message",
+      hideLabel: true,
     },
   ];
 
   return (
     <Box>
-      <h3>Send a message to {username}</h3>
       <Form<any>
         inputs={inputs}
         onSubmit={handleSendMessage}

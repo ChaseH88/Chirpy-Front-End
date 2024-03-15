@@ -17,12 +17,13 @@ export interface FormInput {
   type: FormTypes;
   placeholder: string;
   required: boolean;
-  label: string;
+  label?: string | React.ReactNode;
   value?: string;
   options?: {
     id: string;
     label: string;
   }[];
+  hideLabel?: boolean;
 }
 
 export interface FormProps<T = any> {
@@ -62,7 +63,7 @@ const Form = <T,>({
             case "select":
               return (
                 <FormControl fullWidth required={input.required}>
-                  <InputLabel>{input.label}</InputLabel>
+                  {!input.hideLabel && <InputLabel>{input.label}</InputLabel>}
                   <Select {...field} label={input.label}>
                     {input.options?.map((option, idx) => (
                       <MenuItem key={idx} value={option.id}>
@@ -82,6 +83,7 @@ const Form = <T,>({
                   placeholder={input.placeholder}
                   required={input.required}
                   label={input.label}
+                  hiddenLabel={input.hideLabel}
                 />
               );
             default:
@@ -93,6 +95,7 @@ const Form = <T,>({
                   placeholder={input.placeholder}
                   required={input.required}
                   label={input.label}
+                  hiddenLabel={input.hideLabel}
                 />
               );
           }

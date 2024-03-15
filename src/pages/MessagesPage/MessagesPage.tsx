@@ -5,7 +5,7 @@ import { Avatar } from "../../components/Avatar";
 import { useMessages } from "../../hooks/useMessages";
 import { MessageModelInterface } from "../../types/interfaces";
 import { useMemo } from "react";
-import { SendMessage } from "../../components/SendMessage";
+import { Inbox } from "../../components/Inbox";
 
 const normalizeMessages = (
   messages: MessageModelInterface[] | undefined,
@@ -46,7 +46,7 @@ const MessagesPage = () => {
   const messages = useMemo(
     () => normalizeMessages(messagesArr, currentUser!.id),
     [messagesArr, currentUser]
-  );
+  ) as { [key: string]: MessageModelInterface[] };
 
   return (
     <DashboardLayout
@@ -61,26 +61,7 @@ const MessagesPage = () => {
           <Box mb={5} borderBottom={1} borderColor="primary.main" pb={5}>
             {!!Object.keys(messages)?.length && (
               <Box>
-                {Object.keys(messages).map((key) => {
-                  return (
-                    <Box key={key}>
-                      <h3>{key}</h3>
-                      <hr />
-                      {messages[key].map((message: MessageModelInterface) => {
-                        return (
-                          <Box key={message.id}>
-                            <h4>{message.fromId?.username}</h4>
-                            <p>{message.content}</p>
-                          </Box>
-                        );
-                      })}
-                      <SendMessage
-                        toId={key}
-                        username={messages[key][0]?.fromId?.username}
-                      />
-                    </Box>
-                  );
-                })}
+                <Inbox messages={messages} />
               </Box>
             )}
           </Box>

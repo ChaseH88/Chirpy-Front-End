@@ -39,12 +39,40 @@ export const CURRENT_USER_QUERY = gql`
         fromId {
           id
           username
+          photo
         }
         toId {
           id
           username
+          photo
         }
         createdAt
+      }
+      posts {
+        likes {
+          id
+          content
+          postedBy {
+            id
+            username
+          }
+        }
+        dislikes {
+          id
+          content
+          postedBy {
+            id
+            username
+          }
+        }
+        comments {
+          id
+          content
+          postedBy {
+            id
+            username
+          }
+        }
       }
     }
   }

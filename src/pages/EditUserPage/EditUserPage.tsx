@@ -11,6 +11,7 @@ import { UserModelInterface } from "../../types/interfaces";
 import { icons } from "../../components/UserProfilePhoto";
 import { useSnackbar } from "notistack";
 import { CurrentUserInterface } from "../../providers/AppData";
+import { CURRENT_USER_QUERY } from "../../providers/AppData/queries";
 
 type FormDataType = {
   username: string;
@@ -47,17 +48,13 @@ const EditUserPage = () => {
         return;
       }
 
-      const res = (await editUser({
+      await editUser({
         variables: {
           id: currentUser!.id,
           data,
         },
-      })) as {
-        data: {
-          editUser: UserModelInterface;
-        };
-      };
-      setCurrentUser(res.data.editUser as CurrentUserInterface);
+        refetchQueries: [CURRENT_USER_QUERY],
+      });
       enqueueSnackbar("Profile updated", { variant: "success" });
     } catch (error) {
       enqueueSnackbar("Something went wrong", { variant: "error" });

@@ -7,6 +7,7 @@ import { StateContext as AuthStateContext } from "../Auth";
 import { useQuery } from "@apollo/client";
 import { CURRENT_USER_QUERY } from "./queries";
 import { normalizeGraphQLError } from "../../utilities/normalize-graphql-error";
+import { client } from "../Apollo";
 
 export interface CurrentUserInterface extends UserModelInterface {
   messages: MessageModelInterface[];
@@ -94,6 +95,18 @@ const AppDataProvider = ({
 
   const addToMessagesAction = (message: MessageModelInterface) => {
     dispatch({ type: "ADD_TO_MESSAGES", payload: message });
+
+    client.writeQuery({
+      query: CURRENT_USER_QUERY,
+      data: {
+        currentUser: {
+          user: {
+            ...state.currentUser,
+            messages: [...(state.currentUser?.messages as any), message],
+          },
+        },
+      },
+    });
   };
 
   useEffect(() => {
