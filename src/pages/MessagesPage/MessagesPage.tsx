@@ -1,11 +1,15 @@
 import { useAppData } from "../../hooks/useAppData";
 import { DashboardLayout } from "../../components/DashboardLayout";
-import { Box } from "@mui/material";
+import { Box, Button, MenuItem, Select, Typography } from "@mui/material";
 import { Avatar } from "../../components/Avatar";
 import { useMessages } from "../../hooks/useMessages";
 import { MessageModelInterface } from "../../types/interfaces";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Inbox } from "../../components/Inbox";
+import { useQuery } from "@apollo/client";
+import { SEARCH_QUERY } from "./queries";
+import { useForm } from "react-hook-form";
+import { Form, FormInput } from "../../components/Form";
 
 const normalizeMessages = (
   messages: MessageModelInterface[] | undefined,
@@ -14,39 +18,77 @@ const normalizeMessages = (
   if (!messages) {
     return {};
   }
-  const sortedMessages = messages.reduce((acc: any, message: any) => {
-    if (!acc[message.fromId?.id] && message.fromId?.id !== currentUserId) {
-      acc[message.fromId?.id] = [];
-    }
-    acc[message.fromId?.id]?.push(message);
-    return acc;
-  }, {});
 
-  for (let msg in messages) {
-    if (messages[msg]?.fromId?.id === currentUserId) {
-      sortedMessages[messages[msg]?.toId?.id].push(messages[msg]);
-    }
-  }
+  let inbox: { [key: string]: MessageModelInterface[] } = {};
+  console.log(messages);
 
-  for (let key in sortedMessages) {
-    sortedMessages[key] = sortedMessages[key].sort(
+  messages.forEach((message) => {
+    if (!inbox[message.fromId?.id] && message.fromId?.id !== currentUserId) {
+      inbox[message.fromId?.id] = [];
+    }
+    if (!inbox[message.toId?.id] && message.toId?.id !== currentUserId) {
+      inbox[message.toId?.id] = [];
+    }
+  });
+
+  messages.forEach((message) => {
+    if (message.fromId?.id === currentUserId) {
+      inbox[message.toId?.id]?.push(message);
+    }
+    if (message.toId?.id === currentUserId) {
+      inbox[message.fromId?.id]?.push(message);
+    }
+  });
+
+  for (let key in inbox) {
+    inbox[key] = inbox[key].sort(
       (a: MessageModelInterface, b: MessageModelInterface) => {
         const date = (d: string) => new Date(parseInt(d)).getTime();
         return date(a.createdAt) - date(b.createdAt);
       }
     );
   }
-
-  return sortedMessages;
+  return inbox;
 };
 
 const MessagesPage = () => {
   const { currentUser } = useAppData();
+  const [showNewMessage, setShowNewMessage] = useState(false);
+  const { sendMessageMutation } = useMessages();
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const { data } = useQuery(SEARCH_QUERY);
   const { messages: messagesArr } = useMessages();
+  const formHook = useForm({
+    defaultValues: {
+      content: "",
+    },
+    reValidateMode: "onChange",
+  });
   const messages = useMemo(
     () => normalizeMessages(messagesArr, currentUser!.id),
     [messagesArr, currentUser]
   ) as { [key: string]: MessageModelInterface[] };
+
+  const handleSendMessage = async (data: { toId: string; content: string }) => {
+    await sendMessageMutation({
+      toId: selectedUser!,
+      content: data.content,
+    });
+    formHook.reset();
+  };
+
+  const inputs: FormInput[] = [
+    {
+      name: "content",
+      type: "textarea",
+      placeholder: `Send a message to ${
+        data?.search?.users.find((user: any) => user.id === selectedUser)
+          ?.username || "..."
+      }`,
+      required: true,
+      hideLabel: true,
+    },
+  ];
 
   return (
     <DashboardLayout
@@ -58,15 +100,87 @@ const MessagesPage = () => {
           }}
           p={4}
         >
+          <Box mb={2}>
+            {!showNewMessage ? (
+              <Box display="flex" justifyContent="space-between">
+                <Box>
+                  <Typography variant="h4" m={0} lineHeight={1}>
+                    Messages
+                  </Typography>
+                </Box>
+                <Box>
+                  <Button
+                    onClick={() => setShowNewMessage(true)}
+                    variant="contained"
+                    color="primary"
+                  >
+                    New Message
+                  </Button>
+                </Box>
+              </Box>
+            ) : (
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                flexWrap="wrap"
+              >
+                <Box>
+                  <Typography variant="h4" m={0} lineHeight={1}>
+                    New Message
+                  </Typography>
+                </Box>
+                <Box
+                  display="flex"
+                  justifyContent="flex-end"
+                  alignItems="center"
+                >
+                  <Box>
+                    <Select
+                      value={selectedUser}
+                      onChange={(e) => setSelectedUser(e.target.value)}
+                    >
+                      {data?.search?.users
+                        .filter((user: any) => currentUser?.id !== user.id)
+                        .sort((a: any, b: any) =>
+                          a.username.localeCompare(b.username)
+                        )
+                        ?.map((user: any) => (
+                          <MenuItem value={user.id}>{user.username}</MenuItem>
+                        ))}
+                    </Select>
+                  </Box>
+                  <Box ml={2}>
+                    <Button
+                      onClick={() => {
+                        setShowNewMessage(false);
+                        setSelectedUser(null);
+                      }}
+                      variant="contained"
+                      color="primary"
+                    >
+                      Cancel
+                    </Button>
+                  </Box>
+                </Box>
+                {selectedUser && (
+                  <Box flex={"1 1 100%"} my={2}>
+                    <Form<any>
+                      inputs={inputs}
+                      onSubmit={handleSendMessage}
+                      submitText="Send"
+                      formHook={formHook}
+                    />
+                  </Box>
+                )}
+              </Box>
+            )}
+          </Box>
           <Box mb={5} borderBottom={1} borderColor="primary.main" pb={5}>
             {!!Object.keys(messages)?.length && (
               <Box>
                 <Inbox messages={messages} />
               </Box>
             )}
-          </Box>
-          <Box px={4} py={2}>
-            see your messages here
           </Box>
         </Box>
       )}

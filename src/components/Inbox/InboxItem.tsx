@@ -3,6 +3,7 @@ import { Box, Button } from "@mui/material";
 import { MessageModelInterface } from "../../types/interfaces";
 import { InboxMessage, InboxMessageProps } from "./InboxMessage";
 import { SendMessage } from "../SendMessage";
+import { useAppData } from "../../hooks/useAppData";
 
 interface InboxItemProps extends Pick<InboxMessageProps, "variant"> {
   messages: MessageModelInterface[];
@@ -17,6 +18,7 @@ export const InboxItem = ({
   showMore = true,
 }: InboxItemProps): JSX.Element => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { currentUser } = useAppData();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,7 +51,18 @@ export const InboxItem = ({
           </Box>
         )}
       </Box>
-      <SendMessage message={messages[0]} />
+      <SendMessage
+        toUsername={
+          messages[0].fromId?.id === currentUser?.id
+            ? messages[0].toId?.username
+            : messages[0].fromId?.username
+        }
+        toId={
+          messages[0].fromId?.id === currentUser?.id
+            ? messages[0].toId?.id
+            : messages[0].fromId?.id
+        }
+      />
     </Box>
   );
 };
