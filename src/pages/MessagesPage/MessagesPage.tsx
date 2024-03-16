@@ -10,6 +10,8 @@ import { useQuery } from "@apollo/client";
 import { SEARCH_QUERY } from "./queries";
 import { useForm } from "react-hook-form";
 import { Form, FormInput } from "../../components/Form";
+import { useNavigate } from "react-router-dom";
+import { QUERY_PARAM } from "../../components/Inbox/Inbox";
 
 const normalizeMessages = (
   messages: MessageModelInterface[] | undefined,
@@ -60,6 +62,7 @@ const MessagesPage = () => {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const { data } = useQuery(SEARCH_QUERY);
   const { messages: messagesArr } = useMessages();
+  const navigate = useNavigate();
   const formHook = useForm({
     defaultValues: {
       content: "",
@@ -79,6 +82,8 @@ const MessagesPage = () => {
       content: data.content,
     });
     formHook.reset();
+    setShowNewMessage(false);
+    navigate(`/messages?${QUERY_PARAM}=${selectedUser}`);
   };
 
   const inputs: FormInput[] = [

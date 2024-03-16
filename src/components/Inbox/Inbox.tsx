@@ -25,7 +25,7 @@ interface InboxProps {
   };
 }
 
-const QUERY_PARAM = "from-user";
+export const QUERY_PARAM = "from-user";
 
 export const Inbox = ({ messages }: InboxProps): JSX.Element => {
   const [expandedItem, setExpandedItem] = useState<string>("");

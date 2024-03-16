@@ -4,6 +4,7 @@ import { MessageModelInterface } from "../../types/interfaces";
 import { InboxMessage, InboxMessageProps } from "./InboxMessage";
 import { SendMessage } from "../SendMessage";
 import { useAppData } from "../../hooks/useAppData";
+import { useNavigate } from "react-router-dom";
 
 interface InboxItemProps extends Pick<InboxMessageProps, "variant"> {
   messages: MessageModelInterface[];
@@ -20,6 +21,17 @@ export const InboxItem = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const { currentUser } = useAppData();
   const ref = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  const handleOnSend = () => {
+    navigate(
+      `/messages?from-user=${
+        messages[0]?.fromId?.id === currentUser?.id
+          ? messages[0]?.toId?.id
+          : messages[0]?.fromId?.id
+      }`
+    );
+  };
 
   useEffect(() => {
     if (ref.current) {
@@ -60,6 +72,7 @@ export const InboxItem = ({
         )}
       </Box>
       <SendMessage
+        onSendMessage={handleOnSend}
         toUsername={
           messages[0]?.fromId?.id === currentUser?.id
             ? messages[0]?.toId?.username

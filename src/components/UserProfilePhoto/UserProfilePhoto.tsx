@@ -50,7 +50,6 @@ export const UserProfilePhoto = ({
     () => icons[(icon as any) === "DEFAULT" ? "person" : icon],
     [icon]
   );
-  console.log(icon);
   return (
     <Box
       onClick={onClick}

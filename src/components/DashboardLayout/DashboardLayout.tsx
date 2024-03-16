@@ -20,10 +20,11 @@ export const DashboardLayout = ({
         flexWrap={"nowrap"}
         alignItems={"flex-start"}
         p={4}
+        gap={4}
       >
         <Box
           className="left"
-          flex={"1 1 25%"}
+          flex={"0 1 25%"}
           display={"flex"}
           alignItems={"center"}
           justifyContent={"center"}
