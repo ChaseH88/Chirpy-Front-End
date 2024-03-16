@@ -4,7 +4,7 @@ import { Box, Button, MenuItem, Select, Typography } from "@mui/material";
 import { Avatar } from "../../components/Avatar";
 import { useMessages } from "../../hooks/useMessages";
 import { MessageModelInterface } from "../../types/interfaces";
-import { useLayoutEffect, useMemo, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Inbox } from "../../components/Inbox";
 import { useQuery } from "@apollo/client";
 import { SEARCH_QUERY } from "./queries";

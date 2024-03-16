@@ -28,7 +28,7 @@ export const DashboardLayout = ({
           alignItems={"center"}
           justifyContent={"center"}
           position={"sticky"}
-          top={"10%"}
+          top={"30px"}
         >
           <AvatarComponent />
         </Box>
@@ -43,7 +43,7 @@ export const DashboardLayout = ({
             alignItems={"center"}
             justifyContent={"center"}
             position={"sticky"}
-            top={"10%"}
+            top={"30px"}
           >
             <TrendingComponent />
           </Box>
