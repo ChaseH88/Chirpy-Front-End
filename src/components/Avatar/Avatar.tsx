@@ -24,6 +24,12 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
       {
         variant: "text",
         color: "primary",
+        text: "Home",
+        onClick: () => navigate("/dashboard"),
+      },
+      {
+        variant: "text",
+        color: "primary",
         text: "Messages",
         onClick: () => navigate("/messages"),
       },
@@ -32,12 +38,6 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
         color: "primary",
         text: "Your Posts",
         onClick: () => navigate("/user-posts"),
-      },
-      {
-        variant: "text",
-        color: "primary",
-        text: "All Posts",
-        onClick: () => navigate("/all-posts"),
       },
       {
         variant: "text",
