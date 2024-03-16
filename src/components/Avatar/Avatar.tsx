@@ -76,7 +76,13 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
     >
       <UserProfilePhoto icon={user.photo as IconType} />
       {(user.firstName || user.lastName) && (
-        <Box mb={1}>
+        <Box
+          mb={1}
+          sx={{
+            cursor: "pointer",
+          }}
+          onClick={() => navigate(`/profile/${user.username}`)}
+        >
           <Typography variant="h4">{user.username}</Typography>
         </Box>
       )}
