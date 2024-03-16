@@ -4,10 +4,13 @@ import {
   UserModelInterface,
 } from "../../types/interfaces";
 import { StateContext as AuthStateContext } from "../Auth";
-import { OperationVariables, useQuery } from "@apollo/client";
+import { OperationVariables, useQuery, useSubscription } from "@apollo/client";
 import { CURRENT_USER_QUERY } from "./queries";
 import { normalizeGraphQLError } from "../../utilities/normalize-graphql-error";
 import { client } from "../Apollo";
+import { NEW_FOLLOWER_SUBSCRIPTION } from "./subscription";
+import { useSnackbar } from "notistack";
+import { Box, Typography } from "@mui/material";
 
 export interface CurrentUserInterface extends UserModelInterface {
   messages: MessageModelInterface[];
@@ -71,6 +74,7 @@ const AppDataProvider = ({
 }): JSX.Element => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { isLoggedIn, getToken, logout } = useContext(AuthStateContext)!;
+  const { enqueueSnackbar } = useSnackbar();
   const {
     data,
     loading: useQueryLoading,
@@ -81,6 +85,23 @@ const AppDataProvider = ({
     skip: !isLoggedIn,
     defaultOptions: {
       fetchPolicy: "network-only",
+    },
+  });
+  useSubscription(NEW_FOLLOWER_SUBSCRIPTION, {
+    skip: !isLoggedIn,
+    onData: ({ data: { data } }) => {
+      enqueueSnackbar(
+        <Box
+          sx={{
+            cursor: "pointer",
+          }}
+        >
+          <Typography variant="h6" m={0} fontWeight="bold" fontSize="0.9rem">
+            {data.newFollower.username} is now following you!
+          </Typography>
+        </Box>,
+        { variant: "info" }
+      );
     },
   });
 

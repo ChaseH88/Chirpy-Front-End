@@ -32,6 +32,21 @@ export const CURRENT_USER_QUERY = gql`
             }
           }
         }
+        followers {
+          id
+          username
+          photo
+        }
+        following {
+          id
+          username
+          photo
+        }
+        blocked {
+          id
+          username
+          photo
+        }
       }
       messages {
         id
@@ -39,12 +54,10 @@ export const CURRENT_USER_QUERY = gql`
         fromId {
           id
           username
-          photo
         }
         toId {
           id
           username
-          photo
         }
         createdAt
       }
