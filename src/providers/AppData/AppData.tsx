@@ -4,7 +4,7 @@ import {
   UserModelInterface,
 } from "../../types/interfaces";
 import { StateContext as AuthStateContext } from "../Auth";
-import { useQuery } from "@apollo/client";
+import { OperationVariables, useQuery } from "@apollo/client";
 import { CURRENT_USER_QUERY } from "./queries";
 import { normalizeGraphQLError } from "../../utilities/normalize-graphql-error";
 import { client } from "../Apollo";
@@ -18,6 +18,9 @@ export interface AppDataContext {
   setCurrentUser: (user: CurrentUserInterface | null) => void;
   addToMessagesAction: (message: MessageModelInterface) => void;
   loading: boolean;
+  refetchCurrentUser: (
+    variables?: Partial<OperationVariables> | undefined
+  ) => Promise<any>;
 }
 interface StateType {
   currentUser: CurrentUserInterface | null;
@@ -72,6 +75,7 @@ const AppDataProvider = ({
     data,
     loading: useQueryLoading,
     error: currentUserError,
+    refetch: refetchCurrentUser,
   } = useQuery(CURRENT_USER_QUERY, {
     variables: { token: getToken() },
     skip: !isLoggedIn,
@@ -125,6 +129,7 @@ const AppDataProvider = ({
         setCurrentUser,
         loading: useQueryLoading,
         addToMessagesAction,
+        refetchCurrentUser,
       }}
     >
       {children}

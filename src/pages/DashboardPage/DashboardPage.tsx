@@ -13,13 +13,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useSnackbar } from "notistack";
 import { Editor } from "../../components/Editor";
 import { CURRENT_USER_QUERY } from "../../providers/AppData/queries";
-import { useEditor } from "@tiptap/react";
-import { extensions } from "../../components/Editor/extensions";
 
 export const POST_LIMIT = 20;
 
 const DashboardPage = () => {
   const [nextToken, setNextToken] = useState(0);
+  const [showNewPostComponent, setShowNewPostComponent] = useState(false);
   const {
     loading: getPostLoading,
     data,
@@ -33,42 +32,29 @@ const DashboardPage = () => {
   });
   const [createPost, { loading: createPostLoading }] =
     useMutation(CREATE_POST_MUTATION);
-  const { currentUser } = useAppData();
+  const { currentUser, refetchCurrentUser } = useAppData();
   const formHook = useForm({
-    defaultValues: {
-      content: "",
-    },
     reValidateMode: "onChange",
   });
   const bottomRef = useRef<HTMLDivElement>(null);
   const { enqueueSnackbar } = useSnackbar();
-  const editor = useEditor(
-    {
-      extensions,
-      content: "",
-      onUpdate({ editor }) {
-        // const content = editor.getHTML() || "";
-        // formHook.setValue("content", content);
-        // editor.commands.setContent(content);
-      },
-    },
-    []
-  );
 
   const refreshPosts = useCallback(async () => {
-    refetch({
+    await refetch({
       variables: {
         nextToken: nextToken || 0,
         limit: POST_LIMIT,
       },
     });
-  }, [refetch, nextToken]);
+    await refetchCurrentUser();
+  }, [refetch, nextToken, refetchCurrentUser]);
 
   const handleSubmit = async (data: PostModelInterface) => {
     if (!data.content) {
       alert("Please fill out all fields");
       return;
     }
+    setShowNewPostComponent(false);
     await createPost({
       variables: {
         data: {
@@ -150,33 +136,70 @@ const DashboardPage = () => {
       PostsComponent={() => (
         <Box>
           <Box mb={5} borderBottom={1} borderColor="primary.main" pb={5}>
-            <Box
-              borderRadius={2}
-              overflow={"hidden"}
-              mx={3}
-              sx={{
-                backgroundColor: "white",
-              }}
-              height={200}
-            >
-              <Editor
-                editor={editor!}
+            {showNewPostComponent ? (
+              <Box
+                borderRadius={2}
+                overflow={"hidden"}
+                mx={3}
                 sx={{
-                  px: 3,
-                  pt: 3,
+                  backgroundColor: "white",
                 }}
-              />
-              <Box p={2} display="flex" justifyContent="flex-end">
+                height={200}
+              >
+                <Editor
+                  onChange={(html) => {
+                    formHook.setValue("content", html);
+                  }}
+                  sx={{
+                    px: 3,
+                    pt: 3,
+                  }}
+                  submitButtons={
+                    <Box p={2} display="flex" justifyContent="flex-end" gap={2}>
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => setShowNewPostComponent(false)}
+                        disabled={createPostLoading}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={formHook.handleSubmit(handleSubmit as any)}
+                        disabled={createPostLoading}
+                      >
+                        Post
+                      </Button>
+                    </Box>
+                  }
+                />
+              </Box>
+            ) : (
+              <Box
+                borderRadius={2}
+                p={2}
+                mx={3}
+                sx={{
+                  backgroundColor: "white",
+                }}
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography variant="h5" gutterBottom>
+                  Dashboard
+                </Typography>
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={formHook.handleSubmit(handleSubmit as any)}
-                  disabled={createPostLoading}
+                  onClick={() => setShowNewPostComponent(true)}
                 >
-                  Post
+                  Create new post
                 </Button>
               </Box>
-            </Box>
+            )}
           </Box>
           <Box px={4} py={2}>
             {createPostLoading && (
