@@ -17,6 +17,7 @@ import { InboxItem } from "./InboxItem";
 import { useNavigate } from "react-router-dom";
 import { useAppData } from "../../hooks/useAppData";
 import { UserProfilePhoto } from "../UserProfilePhoto";
+import moment from "moment";
 
 interface InboxProps {
   messages: {
@@ -143,12 +144,24 @@ export const Inbox = ({ messages }: InboxProps): JSX.Element => {
                   </Box>
                   <Box mr={2}>
                     <Typography variant="body2" fontStyle="italic">
-                      Last message sent by
-                      {messages[key][messages[key].length - 1]?.fromId?.id ===
-                      currentUser?.id
-                        ? " you"
-                        : messages[key][messages[key].length - 1]?.fromId
-                            ?.username}{" "}
+                      Last message sent on{" "}
+                      <b>
+                        {moment(
+                          parseInt(
+                            messages[key][messages[key].length - 1]?.createdAt
+                          )
+                        ).format("MM DD YY, h:mm:ss a")}
+                      </b>
+                      {" by"}
+                      <b>
+                        {messages[key][messages[key].length - 1]?.fromId?.id ===
+                        currentUser?.id
+                          ? " you"
+                          : ` ${
+                              messages[key][messages[key].length - 1]?.fromId
+                                ?.username
+                            }`}
+                      </b>
                     </Typography>
                   </Box>
                 </Box>

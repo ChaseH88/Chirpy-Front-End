@@ -46,8 +46,11 @@ export const UserProfilePhoto = ({
   svgWidth = 65,
   svgHeight = 65,
 }: UserProfilePhotoProps) => {
-  const Icon = useMemo(() => icons[(icon as IconType) || "person"], [icon]);
-
+  const Icon = useMemo(
+    () => icons[(icon as any) === "DEFAULT" ? "person" : icon],
+    [icon]
+  );
+  console.log(icon);
   return (
     <Box
       onClick={onClick}

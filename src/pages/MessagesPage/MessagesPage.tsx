@@ -4,7 +4,7 @@ import { Box, Button, MenuItem, Select, Typography } from "@mui/material";
 import { Avatar } from "../../components/Avatar";
 import { useMessages } from "../../hooks/useMessages";
 import { MessageModelInterface } from "../../types/interfaces";
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 import { Inbox } from "../../components/Inbox";
 import { useQuery } from "@apollo/client";
 import { SEARCH_QUERY } from "./queries";
@@ -53,6 +53,9 @@ const normalizeMessages = (
 const MessagesPage = () => {
   const { currentUser } = useAppData();
   const [showNewMessage, setShowNewMessage] = useState(false);
+  const [messages, setMessages] = useState<{
+    [key: string]: MessageModelInterface[];
+  } | null>(null);
   const { sendMessageMutation } = useMessages();
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const { data } = useQuery(SEARCH_QUERY);
@@ -63,10 +66,12 @@ const MessagesPage = () => {
     },
     reValidateMode: "onChange",
   });
-  const messages = useMemo(
-    () => normalizeMessages(messagesArr, currentUser!.id),
-    [messagesArr, currentUser]
-  ) as { [key: string]: MessageModelInterface[] };
+
+  useLayoutEffect(() => {
+    if (messagesArr) {
+      setMessages(normalizeMessages(messagesArr, currentUser!.id));
+    }
+  }, [messagesArr, currentUser]);
 
   const handleSendMessage = async (data: { toId: string; content: string }) => {
     await sendMessageMutation({
@@ -135,9 +140,12 @@ const MessagesPage = () => {
                 >
                   <Box>
                     <Select
-                      value={selectedUser}
+                      value={selectedUser || "Select User"}
                       onChange={(e) => setSelectedUser(e.target.value)}
                     >
+                      <MenuItem value={"Select User"} disabled>
+                        Select User
+                      </MenuItem>
                       {data?.search?.users
                         .filter((user: any) => currentUser?.id !== user.id)
                         .sort((a: any, b: any) =>
@@ -175,7 +183,7 @@ const MessagesPage = () => {
             )}
           </Box>
           <Box mb={5} borderBottom={1} borderColor="primary.main" pb={5}>
-            {!!Object.keys(messages)?.length && (
+            {messages && !!Object.keys(messages)?.length && (
               <Box>
                 <Inbox messages={messages} />
               </Box>
