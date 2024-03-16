@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   TextField,
   Button,
@@ -49,6 +49,21 @@ const Form = <T,>({
     right: "flex-end",
     full: "center",
   }[buttonPosition];
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        (e.ctrlKey && e.key === "Enter") ||
+        (e.metaKey && e.key === "Enter")
+      ) {
+        handleSubmit(onSubmit)();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleSubmit, onSubmit]);
 
   const renderInput = (input: FormInput, index: number) => {
     return (
