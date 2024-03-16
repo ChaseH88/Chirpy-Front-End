@@ -9,7 +9,6 @@ import {
 } from "./mutations";
 import { useAppData } from "../../hooks/useAppData";
 import { useState } from "react";
-import { GET_DASHBOARD_POSTS } from "../../pages/DashboardPage/queries";
 import { PostContainer } from "./styled";
 import moment from "moment";
 import { Comments } from "./Comments";
@@ -18,7 +17,7 @@ import { LikeDislikeButtons } from "../LikeDislikeButtons/LikeDislikeButtons";
 import { useNavigate } from "react-router-dom";
 import { ActionMenu } from "../ActionMenu";
 import { useSnackbar } from "notistack";
-import { POST_LIMIT } from "../../pages/DashboardPage";
+import { UserHoverMenu } from "../UserHoverMenu";
 
 export interface PostProps {
   post: PostModelInterface;
@@ -149,6 +148,7 @@ export const Post = ({
               svgHeight={12}
               svgWidth={12}
             />
+
             <Typography variant="body2" ml={1}>
               {post.postedBy.username}
             </Typography>
@@ -181,7 +181,11 @@ export const Post = ({
           background: "#eee",
         }}
       >
-        <Typography variant="body1">{post.content}</Typography>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: post.content,
+          }}
+        />
       </Box>
       <Box
         className="postedBy"
@@ -199,14 +203,16 @@ export const Post = ({
               svgWidth={12}
             />
           </Box>
-          <Typography
-            variant="body2"
-            fontStyle={"italic"}
-            fontWeight={700}
-            mr={1}
-          >
-            {post.postedBy.username}
-          </Typography>{" "}
+          <UserHoverMenu user={post.postedBy}>
+            <Typography
+              variant="body2"
+              fontStyle={"italic"}
+              fontWeight={700}
+              mr={1}
+            >
+              {post.postedBy.username}
+            </Typography>
+          </UserHoverMenu>{" "}
           -
           <Typography variant="body2" ml={1}>
             {moment(post.createdAt).format("MMMM Do YYYY, h:mm:ss a")}

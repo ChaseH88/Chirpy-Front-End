@@ -8,6 +8,9 @@ export interface UserModelInterface {
   bio: string;
   photo: string;
   posts: PostModelInterface[];
+  followers: UserModelInterface[];
+  following: UserModelInterface[];
+  blocked: UserModelInterface[];
   createdAt: Date;
   updatedAt: Date;
 }
