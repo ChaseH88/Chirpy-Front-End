@@ -37,7 +37,15 @@ export const InboxItem = ({
 
   return (
     <Box className="inbox-item">
-      <Box maxHeight={400} overflow={"auto scroll"} ref={ref}>
+      <Box
+        maxHeight={400}
+        overflow={"auto scroll"}
+        ref={ref}
+        sx={{
+          backgroundColor: "white",
+        }}
+        p={2}
+      >
         {displayedMessages.map((message: MessageModelInterface) => (
           <Box key={message.id}>
             <InboxMessage message={message} variant={variant} />
@@ -53,14 +61,14 @@ export const InboxItem = ({
       </Box>
       <SendMessage
         toUsername={
-          messages[0].fromId?.id === currentUser?.id
-            ? messages[0].toId?.username
-            : messages[0].fromId?.username
+          messages[0]?.fromId?.id === currentUser?.id
+            ? messages[0]?.toId?.username
+            : messages[0]?.fromId?.username
         }
         toId={
-          messages[0].fromId?.id === currentUser?.id
-            ? messages[0].toId?.id
-            : messages[0].fromId?.id
+          messages[0]?.fromId?.id === currentUser?.id
+            ? messages[0]?.toId?.id
+            : messages[0]?.fromId?.id
         }
       />
     </Box>

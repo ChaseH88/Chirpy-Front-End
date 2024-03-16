@@ -20,7 +20,6 @@ const normalizeMessages = (
   }
 
   let inbox: { [key: string]: MessageModelInterface[] } = {};
-  console.log(messages);
 
   messages.forEach((message) => {
     if (!inbox[message.fromId?.id] && message.fromId?.id !== currentUserId) {

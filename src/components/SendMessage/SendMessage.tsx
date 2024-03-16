@@ -36,7 +36,7 @@ export const SendMessage = ({
   const inputs: FormInput[] = [
     {
       name: "content",
-      type: "text",
+      type: "textarea",
       placeholder: `Send a message to ${toUsername}...`,
       required: true,
       hideLabel: true,
