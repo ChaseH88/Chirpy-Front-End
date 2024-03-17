@@ -14,10 +14,11 @@ import moment from "moment";
 import { Comments } from "./Comments";
 import { UserProfilePhoto } from "../UserProfilePhoto";
 import { LikeDislikeButtons } from "../LikeDislikeButtons/LikeDislikeButtons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ActionMenu } from "../ActionMenu";
 import { useSnackbar } from "notistack";
 import { UserHoverMenu } from "../UserHoverMenu";
+import { FIND_POST_QUERY } from "../../pages/FindPostPage/queries";
 
 export interface PostProps {
   post: PostModelInterface;
@@ -44,10 +45,12 @@ export const Post = ({
   const [createPostComment, { loading: createPostCommentLoading }] =
     useMutation(CREATE_POST_COMMENT_MUTATION);
   const navigate = useNavigate();
+  const { postId } = useParams();
   const { currentUser } = useAppData();
   const [deletePost, { loading: deletePostLoading }] =
     useMutation(DELETE_POST_MUTATION);
   const { enqueueSnackbar } = useSnackbar();
+  const isCurrentPostPage = postId === post.id;
 
   const handleCreatePostComment = async (data: CommentInterface) => {
     if (!data.comment) {
@@ -62,6 +65,14 @@ export const Post = ({
           comment: data.comment,
         },
       },
+      refetchQueries: [
+        {
+          query: FIND_POST_QUERY,
+          variables: {
+            id: post.id,
+          },
+        },
+      ],
     });
     onCreatePostComment?.();
     enqueueSnackbar(res.data.createPostComment, {
@@ -86,7 +97,7 @@ export const Post = ({
   const inputs: FormInput[] = [
     {
       name: "comment",
-      type: "text",
+      type: "textarea",
       placeholder: "Enter your comment",
       required: true,
       label: "Comment",
@@ -154,10 +165,14 @@ export const Post = ({
             </Typography>
             <ActionMenu
               items={[
-                {
-                  onClick: () => navigate(`/post/${post.id}`),
-                  text: "See Post",
-                },
+                ...(!isCurrentPostPage
+                  ? [
+                      {
+                        onClick: () => navigate(`/post/${post.id}`),
+                        text: "See Post",
+                      },
+                    ]
+                  : []),
                 {
                   onClick: () => handleDeletePost(post.id),
                   text: "Delete",
@@ -244,17 +259,19 @@ export const Post = ({
           </Typography>
         </Box>
         <Box display="flex" gap={1}>
-          <Button
-            size="small"
-            variant="outlined"
-            color="primary"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/post/${post.id}`);
-            }}
-          >
-            See Post
-          </Button>
+          {!isCurrentPostPage && (
+            <Button
+              size="small"
+              variant="outlined"
+              color="primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/post/${post.id}`);
+              }}
+            >
+              See Post
+            </Button>
+          )}
           <Button
             size="small"
             variant="outlined"
@@ -268,23 +285,25 @@ export const Post = ({
           </Button>
         </Box>
       </Box>
-      {commentOn ? (
-        <Form<CommentInterface>
-          inputs={inputs}
-          onSubmit={handleCreatePostComment}
-          submitText="Comment"
-          formHook={formHook}
-          isLoading={createPostCommentLoading}
+      <>
+        {commentOn && (
+          <Box mb={2}>
+            <Form<CommentInterface>
+              inputs={inputs}
+              onSubmit={handleCreatePostComment}
+              submitText="Comment"
+              formHook={formHook}
+              isLoading={createPostCommentLoading}
+              onCancel={toggleCommentBox}
+            />
+          </Box>
+        )}
+        <Comments
+          comments={post.comments}
+          postsToShow={commentsToShow}
+          OverrideToggleButton={OverrideCommentButton}
         />
-      ) : (
-        <>
-          <Comments
-            comments={post.comments}
-            postsToShow={commentsToShow}
-            OverrideToggleButton={OverrideCommentButton}
-          />
-        </>
-      )}
+      </>
     </PostContainer>
   );
 };

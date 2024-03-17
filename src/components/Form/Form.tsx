@@ -30,6 +30,7 @@ export interface FormProps<T = any> {
   inputs: FormInput[];
   submitText: string;
   onSubmit: (data: T) => void;
+  onCancel?: () => void;
   isLoading?: boolean;
   formHook: UseFormReturn<any>;
   buttonPosition?: "center" | "right" | "left" | "full";
@@ -42,6 +43,7 @@ const Form = <T,>({
   isLoading,
   formHook: { control, handleSubmit },
   buttonPosition = "full",
+  onCancel,
 }: FormProps<T>) => {
   const buttonPositionStyle = {
     left: "flex-start",
@@ -127,7 +129,17 @@ const Form = <T,>({
       <fieldset disabled={isLoading} style={{ border: "none" }}>
         <Box display="flex" flexDirection="column" gap={2}>
           {inputs.map(renderInput)}
-          <Box display="flex" justifyContent={buttonPositionStyle}>
+          <Box display="flex" justifyContent={buttonPositionStyle} gap={2}>
+            {onCancel && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={onCancel}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+            )}
             <Button type="submit" variant="contained" color="primary">
               {isLoading ? "Loading..." : submitText}
             </Button>
