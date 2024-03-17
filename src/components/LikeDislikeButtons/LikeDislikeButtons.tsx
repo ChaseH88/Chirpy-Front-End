@@ -9,6 +9,8 @@ import { useAppData } from "../../hooks/useAppData";
 import { GET_DASHBOARD_POSTS } from "../../pages/DashboardPage/queries";
 import { PostModelInterface } from "../../types/interfaces";
 import { useSnackbar } from "notistack";
+import { FIND_POST_QUERY } from "../../pages/FindPostPage/queries";
+import { useParams } from "react-router-dom";
 
 export interface LikeDislikeButtonsProps
   extends Pick<PostModelInterface, "likes" | "dislikes" | "postedBy" | "id"> {}
@@ -19,6 +21,7 @@ export const LikeDislikeButtons = ({
   postedBy,
   id: postId,
 }: LikeDislikeButtonsProps) => {
+  const { postId: postIdFromParams } = useParams();
   const [likePost, { loading: likePostLoading }] =
     useMutation(LIKE_POST_MUTATION);
   const [dislikePost, { loading: dislikePostLoading }] = useMutation(
@@ -36,7 +39,19 @@ export const LikeDislikeButtons = ({
           userId: currentUser!.id,
         },
       },
-      refetchQueries: [{ query: GET_DASHBOARD_POSTS }],
+      refetchQueries: [
+        { query: GET_DASHBOARD_POSTS },
+        ...(postIdFromParams
+          ? [
+              {
+                query: FIND_POST_QUERY,
+                variables: {
+                  id: postId,
+                },
+              },
+            ]
+          : []),
+      ],
     });
     if (res?.data?.likePost) {
       enqueueSnackbar(res.data.likePost, { variant: "success" });
@@ -51,7 +66,19 @@ export const LikeDislikeButtons = ({
           userId: currentUser!.id,
         },
       },
-      refetchQueries: [{ query: GET_DASHBOARD_POSTS }],
+      refetchQueries: [
+        { query: GET_DASHBOARD_POSTS },
+        ...(postIdFromParams
+          ? [
+              {
+                query: FIND_POST_QUERY,
+                variables: {
+                  id: postId,
+                },
+              },
+            ]
+          : []),
+      ],
     });
     if (res?.data?.dislikePost) {
       enqueueSnackbar(res.data.dislikePost, { variant: "success" });

@@ -27,11 +27,6 @@ export const UserHoverMenu = ({
     setAnchorEl(null);
   }, []);
 
-  console.log({
-    followers,
-    following,
-  });
-
   return (
     <Box onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       {children}

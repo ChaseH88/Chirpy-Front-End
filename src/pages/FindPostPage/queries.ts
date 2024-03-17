@@ -7,6 +7,22 @@ export const FIND_POST_QUERY = gql`
       postedBy {
         id
         username
+        followers {
+          id
+          username
+        }
+        following {
+          id
+          username
+        }
+      }
+      likes {
+        id
+        username
+      }
+      dislikes {
+        id
+        username
       }
       content
       comments {
