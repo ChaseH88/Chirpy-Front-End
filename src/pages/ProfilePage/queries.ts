@@ -27,6 +27,14 @@ export const GET_USER_BY_USERNAME_QUERY = gql`
           id
           username
           photo
+          followers {
+            id
+            username
+          }
+          following {
+            id
+            username
+          }
         }
         content
         comments {

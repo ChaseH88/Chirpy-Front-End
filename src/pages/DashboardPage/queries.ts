@@ -7,6 +7,14 @@ export const GET_DASHBOARD_POSTS = gql`
       postedBy {
         id
         username
+        followers {
+          id
+          username
+        }
+        following {
+          id
+          username
+        }
       }
       content
       comments {
@@ -37,6 +45,14 @@ export const GET_DASHBOARD_POSTS = gql`
           id
           username
           photo
+          followers {
+            id
+            username
+          }
+          following {
+            id
+            username
+          }
         }
         content
         comments {
