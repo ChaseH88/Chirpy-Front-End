@@ -1,13 +1,19 @@
 import { useAppData } from "../../hooks/useAppData";
 import { DashboardLayout } from "../../components/DashboardLayout";
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Input,
+  Typography,
+} from "@mui/material";
 import { Avatar } from "../../components/Avatar";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_USER_BY_USERNAME_QUERY } from "./queries";
 import { UserProfilePhoto } from "../../components/UserProfilePhoto";
 import { Posts } from "../../components/Posts/Posts";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FOLLOW_USER } from "./mutations";
 import { useSnackbar } from "notistack";
 import { CURRENT_USER_QUERY } from "../../providers/AppData/queries";
@@ -15,6 +21,7 @@ import { GET_DASHBOARD_POSTS } from "../DashboardPage/queries";
 
 const ProfilePage = () => {
   const { currentUser } = useAppData();
+  const [showEditProfile, setShowEditProfile] = useState(false);
   const { username } = useParams();
   const { enqueueSnackbar } = useSnackbar();
   const { data, loading } = useQuery(GET_USER_BY_USERNAME_QUERY, {
@@ -113,6 +120,26 @@ const ProfilePage = () => {
                         following
                       </Typography>
                     </Box>
+                    {isCurrentUser && (
+                      <Box mt={1} display="flex" gap={2}>
+                        <Button
+                          variant={showEditProfile ? "outlined" : "contained"}
+                          color="primary"
+                          onClick={() => setShowEditProfile(!showEditProfile)}
+                        >
+                          {showEditProfile ? "Cancel" : "Edit Profile"}
+                        </Button>
+                        {showEditProfile && (
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => setShowEditProfile(false)}
+                          >
+                            Save
+                          </Button>
+                        )}
+                      </Box>
+                    )}
                     {currentUser?.id !== data?.findUserByUsername.id && (
                       <Box
                         flex={"1 1 100%"}
@@ -136,9 +163,18 @@ const ProfilePage = () => {
                     )}
                   </Box>
                   <Box className="content" mt={2} p={2}>
-                    <Typography variant="body1">
-                      {data?.findUserByUsername.bio}
-                    </Typography>
+                    {showEditProfile ? (
+                      <Input
+                        fullWidth
+                        type="textarea"
+                        value={data?.findUserByUsername.bio}
+                        onChange={() => {}}
+                      />
+                    ) : (
+                      <Typography variant="body1">
+                        {data?.findUserByUsername.bio}
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
               </Box>
