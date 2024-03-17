@@ -6,6 +6,7 @@ import { MessageProvider } from "./providers/Message/MessageProvider";
 import { Routes as AppRoutes } from "./components/Routes";
 import { GlobalStyle } from "./utilities/global-styles";
 import { SnackbarProvider } from "notistack";
+import { ModalProvider } from "./providers/Modal/ModalProvider";
 
 const App = (): JSX.Element => (
   <div className="App">
@@ -15,7 +16,9 @@ const App = (): JSX.Element => (
           <AuthProvider>
             <AppDataProvider>
               <MessageProvider>
-                <AppRoutes />
+                <ModalProvider>
+                  <AppRoutes />
+                </ModalProvider>
               </MessageProvider>
             </AppDataProvider>
           </AuthProvider>

@@ -19,6 +19,7 @@ import { ActionMenu } from "../ActionMenu";
 import { useSnackbar } from "notistack";
 import { UserHoverMenu } from "../UserHoverMenu";
 import { FIND_POST_QUERY } from "../../pages/FindPostPage/queries";
+import { useModal } from "../../providers/Modal/ModalProvider";
 
 export interface PostProps {
   post: PostModelInterface;
@@ -36,6 +37,7 @@ export const Post = ({
   onCreatePostComment,
 }: PostProps) => {
   const [commentOn, setCommentOn] = useState(false);
+  const { showModal, hideModal } = useModal();
   const formHook = useForm({
     defaultValues: {
       comment: "",
@@ -83,15 +85,40 @@ export const Post = ({
   const toggleCommentBox = () => setCommentOn(!commentOn);
 
   const handleDeletePost = async (id: string) => {
-    const res = await deletePost({
-      variables: {
-        id,
-      },
-    });
-    onDeletePost?.();
-    enqueueSnackbar(res.data.deletePost, {
-      variant: "success",
-    });
+    showModal(
+      <Box>
+        <Typography variant="h6" fontWeight={700}>
+          Are you sure you want to delete this post?
+        </Typography>
+        <Box display={"flex"} gap={1} justifyContent={"center"} mt={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={async () => {
+              hideModal();
+              const res = await deletePost({
+                variables: {
+                  id,
+                },
+              });
+              onDeletePost?.();
+              enqueueSnackbar(res.data.deletePost, {
+                variant: "success",
+              });
+            }}
+          >
+            Yes
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => hideModal()}
+          >
+            No
+          </Button>
+        </Box>
+      </Box>
+    );
   };
 
   const inputs: FormInput[] = [
