@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { IconType, UserProfilePhoto } from "../UserProfilePhoto";
+import { useAppData } from "../../hooks/useAppData";
 
 interface AvatarProps {
   user: UserModelInterface;
@@ -18,6 +19,7 @@ interface AvatarProps {
 export const Avatar = ({ user, buttons }: AvatarProps) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { currentUser } = useAppData();
 
   const _buttons = useMemo(
     () => [
@@ -36,20 +38,14 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
       {
         variant: "text",
         color: "primary",
-        text: "Your Posts",
-        onClick: () => navigate("/user-posts"),
-      },
-      {
-        variant: "text",
-        color: "primary",
-        text: "Trending Posts",
+        text: "Trending",
         onClick: () => navigate("/trending-posts"),
       },
       {
         variant: "text",
         color: "primary",
-        text: "Edit Profile",
-        onClick: () => navigate("/edit-user"),
+        text: "Your Profile",
+        onClick: () => navigate(`/profile/${currentUser?.username}`),
       },
       {
         variant: "outlined",
@@ -58,7 +54,7 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
         onClick: logout,
       },
     ],
-    [logout, navigate]
+    [logout, navigate, currentUser]
   );
 
   return (

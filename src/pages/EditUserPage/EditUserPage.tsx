@@ -5,12 +5,9 @@ import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
 import { Box, Typography } from "@mui/material";
 import { useEffect } from "react";
-import { Avatar } from "../../components/Avatar";
 import { EDIT_USER_MUTATION } from "./mutations";
-import { UserModelInterface } from "../../types/interfaces";
 import { icons } from "../../components/UserProfilePhoto";
 import { useSnackbar } from "notistack";
-import { CurrentUserInterface } from "../../providers/AppData";
 import { CURRENT_USER_QUERY } from "../../providers/AppData/queries";
 
 type FormDataType = {
@@ -26,7 +23,7 @@ const EditUserPage = () => {
   const [editUser, { loading: editUserLoading }] =
     useMutation(EDIT_USER_MUTATION);
 
-  const { currentUser, setCurrentUser } = useAppData();
+  const { currentUser } = useAppData();
   const formHook = useForm({
     reValidateMode: "onChange",
   });
@@ -131,11 +128,6 @@ const EditUserPage = () => {
               isLoading={editUserLoading}
             />
           </Box>
-        </Box>
-      )}
-      AvatarComponent={() => (
-        <Box>
-          <Avatar user={currentUser!} />
         </Box>
       )}
     />

@@ -7,17 +7,17 @@ import {
   Input,
   Typography,
 } from "@mui/material";
-import { Avatar } from "../../components/Avatar";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_USER_BY_USERNAME_QUERY } from "./queries";
 import { UserProfilePhoto } from "../../components/UserProfilePhoto";
 import { Posts } from "../../components/Posts/Posts";
 import { useMemo, useState } from "react";
-import { FOLLOW_USER } from "./mutations";
+import { EDIT_USER_MUTATION, FOLLOW_USER } from "./mutations";
 import { useSnackbar } from "notistack";
 import { CURRENT_USER_QUERY } from "../../providers/AppData/queries";
 import { GET_DASHBOARD_POSTS } from "../DashboardPage/queries";
+import { useForm } from "react-hook-form";
 
 const ProfilePage = () => {
   const { currentUser } = useAppData();
@@ -29,7 +29,13 @@ const ProfilePage = () => {
       username,
     },
   });
+  const editProfileFormHook = useForm({
+    reValidateMode: "onChange",
+  });
+
   const [followUser, { loading: followUserLoad }] = useMutation(FOLLOW_USER);
+  const [editUser, { loading: editUserLoading }] =
+    useMutation(EDIT_USER_MUTATION);
 
   const handleFollowUser = async (id: string) => {
     const res = await followUser({
@@ -46,6 +52,27 @@ const ProfilePage = () => {
       enqueueSnackbar(res?.data?.followUser, {
         variant: "info",
       });
+    }
+  };
+
+  const handleSubmit = async () => {
+    setShowEditProfile(false);
+    try {
+      if (!Object.values(editProfileFormHook.getValues()).every(Boolean)) {
+        return;
+      }
+
+      await editUser({
+        variables: {
+          id: currentUser!.id,
+          data: editProfileFormHook.getValues(),
+        },
+        refetchQueries: [CURRENT_USER_QUERY],
+      });
+      editProfileFormHook.reset();
+      enqueueSnackbar("Profile updated", { variant: "success" });
+    } catch (error) {
+      enqueueSnackbar("Something went wrong", { variant: "error" });
     }
   };
 
@@ -108,6 +135,53 @@ const ProfilePage = () => {
                       mt={2}
                       gap={2}
                     >
+                      {!showEditProfile ? (
+                        <Typography variant="body2">
+                          {`
+                          ${data?.findUserByUsername.firstName || ""} 
+                          ${data?.findUserByUsername.lastName || ""}
+                        `}
+                        </Typography>
+                      ) : (
+                        <>
+                          <Input
+                            placeholder="First Name"
+                            defaultValue={data?.findUserByUsername.firstName}
+                            onChange={(e) => {
+                              editProfileFormHook.setValue(
+                                "firstName",
+                                e.target.value
+                              );
+                            }}
+                            sx={{
+                              fontSize: 12,
+                              maxWidth: 100,
+                            }}
+                          />
+                          <Input
+                            placeholder="Last Name"
+                            defaultValue={data?.findUserByUsername.lastName}
+                            onChange={(e) => {
+                              editProfileFormHook.setValue(
+                                "lastName",
+                                e.target.value
+                              );
+                            }}
+                            sx={{
+                              fontSize: 12,
+                              maxWidth: 100,
+                            }}
+                          />
+                        </>
+                      )}
+                    </Box>
+                    <Box
+                      flex={"1 1 100%"}
+                      display="flex"
+                      justifyContent="center"
+                      mt={2}
+                      gap={2}
+                    >
                       <Typography variant="body2">
                         {data?.findUserByUsername.followers?.length || 0}{" "}
                         follower
@@ -133,7 +207,7 @@ const ProfilePage = () => {
                           <Button
                             variant="contained"
                             color="primary"
-                            onClick={() => setShowEditProfile(false)}
+                            onClick={handleSubmit}
                           >
                             Save
                           </Button>
@@ -167,8 +241,10 @@ const ProfilePage = () => {
                       <Input
                         fullWidth
                         type="textarea"
-                        value={data?.findUserByUsername.bio}
-                        onChange={() => {}}
+                        defaultValue={data?.findUserByUsername.bio}
+                        onChange={(e) => {
+                          editProfileFormHook.setValue("bio", e.target.value);
+                        }}
                       />
                     ) : (
                       <Typography variant="body1">
@@ -189,11 +265,6 @@ const ProfilePage = () => {
             </Box>
           )}
         </>
-      )}
-      AvatarComponent={() => (
-        <Box>
-          <Avatar user={currentUser!} />
-        </Box>
       )}
     />
   );

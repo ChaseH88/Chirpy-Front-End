@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { PostModelInterface } from "../../types/interfaces";
-import { Avatar } from "../../components/Avatar";
 import { Trending } from "../../components/Trending";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSnackbar } from "notistack";
@@ -32,7 +31,7 @@ const DashboardPage = () => {
   });
   const [createPost, { loading: createPostLoading }] =
     useMutation(CREATE_POST_MUTATION);
-  const { currentUser, refetchCurrentUser } = useAppData();
+  const { refetchCurrentUser } = useAppData();
   const formHook = useForm({
     reValidateMode: "onChange",
   });
@@ -236,11 +235,6 @@ const DashboardPage = () => {
               </>
             )}
           </Box>
-        </Box>
-      )}
-      AvatarComponent={() => (
-        <Box>
-          <Avatar user={currentUser!} />
         </Box>
       )}
       TrendingComponent={() => (

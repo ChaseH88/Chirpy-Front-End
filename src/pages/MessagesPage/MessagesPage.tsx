@@ -1,7 +1,6 @@
 import { useAppData } from "../../hooks/useAppData";
 import { DashboardLayout } from "../../components/DashboardLayout";
 import { Box, Button, MenuItem, Select, Typography } from "@mui/material";
-import { Avatar } from "../../components/Avatar";
 import { useMessages } from "../../hooks/useMessages";
 import { MessageModelInterface } from "../../types/interfaces";
 import { useLayoutEffect, useState } from "react";
@@ -194,11 +193,6 @@ const MessagesPage = () => {
               </Box>
             )}
           </Box>
-        </Box>
-      )}
-      AvatarComponent={() => (
-        <Box>
-          <Avatar user={currentUser!} />
         </Box>
       )}
     />

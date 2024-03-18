@@ -1,17 +1,18 @@
 import { Box } from "@mui/material";
 import { Container } from "./styled";
+import { Avatar } from "../Avatar";
+import { useAppData } from "../../hooks/useAppData";
 
 interface DashboardLayoutProps {
   PostsComponent: React.ComponentType;
-  AvatarComponent: React.ComponentType;
   TrendingComponent?: React.ComponentType;
 }
 
 export const DashboardLayout = ({
   PostsComponent,
-  AvatarComponent,
   TrendingComponent,
 }: DashboardLayoutProps) => {
+  const { currentUser } = useAppData();
   return (
     <Container>
       <Box
@@ -31,7 +32,7 @@ export const DashboardLayout = ({
           position={"sticky"}
           top={"30px"}
         >
-          <AvatarComponent />
+          <Avatar user={currentUser!} />
         </Box>
         <Box className="middle" flex={"1 1 50%"}>
           <PostsComponent />
