@@ -54,10 +54,12 @@ export const CURRENT_USER_QUERY = gql`
         fromId {
           id
           username
+          photo
         }
         toId {
           id
           username
+          photo
         }
         createdAt
       }
