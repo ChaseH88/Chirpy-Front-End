@@ -1,10 +1,8 @@
 import { MouseEvent, ReactNode, useCallback, useState } from "react";
-// import { useAppData } from "../../hooks/useAppData";
-import { Box, Menu, MenuItem, Typography } from "@mui/material";
+import { Box, Menu, Typography } from "@mui/material";
 import { UserModelInterface } from "../../types/interfaces";
 import { UserProfilePhoto } from "../UserProfilePhoto";
 import { useNavigate } from "react-router-dom";
-// import { UserProfilePhoto } from "../UserProfilePhoto";
 
 export interface UserHoverMenuProps {
   user: UserModelInterface;
@@ -17,7 +15,6 @@ export const UserHoverMenu = ({
 }: UserHoverMenuProps): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  // const { currentUser } = useAppData();
   const navigate = useNavigate();
   const handleMouseEnter = useCallback((event: MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget);

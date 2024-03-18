@@ -2,9 +2,6 @@ import { Box, Typography } from "@mui/material";
 import { PostModelInterface } from "../../types/interfaces";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
-import ThumbUp from "@mui/icons-material/ThumbUp";
-import { useAppData } from "../../hooks/useAppData";
-import ThumbDown from "@mui/icons-material/ThumbDown";
 import { LikeDislikeButtons } from "../LikeDislikeButtons/LikeDislikeButtons";
 import { UserHoverMenu } from "../UserHoverMenu";
 
@@ -14,8 +11,6 @@ interface TrendingProps {
 
 export const Trending = ({ trendingPosts }: TrendingProps) => {
   const navigate = useNavigate();
-  const { currentUser } = useAppData();
-
   return (
     <Box
       sx={{
