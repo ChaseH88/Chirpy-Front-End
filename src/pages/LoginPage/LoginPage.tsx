@@ -2,12 +2,12 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "@apollo/client";
 import { Form, FormInput } from "../../components/Form";
 import { useNavigate } from "react-router-dom";
-import { LOGIN_MUTATION } from "./mutations";
 import { UserModelInterface } from "../../types/interfaces";
 import { useAuth } from "../../hooks/useAuth";
 import { HomeLayout } from "../../components/HomeLayout";
 import { Box, Button } from "@mui/material";
 import { useSnackbar } from "notistack";
+import { LOGIN_MUTATION } from "../../graphql/mutations/login";
 
 type FormDataType = {
   username: string;

@@ -5,12 +5,12 @@ import {
 } from "../../types/interfaces";
 import { StateContext as AuthStateContext } from "../Auth";
 import { OperationVariables, useQuery, useSubscription } from "@apollo/client";
-import { CURRENT_USER_QUERY } from "./queries";
 import { normalizeGraphQLError } from "../../utilities/normalize-graphql-error";
 import { client } from "../Apollo";
-import { NEW_FOLLOWER_SUBSCRIPTION } from "./subscription";
 import { useSnackbar } from "notistack";
 import { Box, Typography } from "@mui/material";
+import { CURRENT_USER_QUERY } from "../../graphql/queries/current-user";
+import { NEW_FOLLOWER_SUBSCRIPTION } from "../../graphql/subscriptions/new-follower";
 
 export interface CurrentUserInterface extends UserModelInterface {
   messages: MessageModelInterface[];

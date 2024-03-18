@@ -3,10 +3,6 @@ import { CommentInterface, PostModelInterface } from "../../types/interfaces";
 import { Form, FormInput } from "../Form";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@apollo/client";
-import {
-  CREATE_POST_COMMENT_MUTATION,
-  DELETE_POST_MUTATION,
-} from "./mutations";
 import { useAppData } from "../../hooks/useAppData";
 import { useState } from "react";
 import { PostContainer } from "./styled";
@@ -18,8 +14,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ActionMenu } from "../ActionMenu";
 import { useSnackbar } from "notistack";
 import { UserHoverMenu } from "../UserHoverMenu";
-import { FIND_POST_QUERY } from "../../pages/FindPostPage/queries";
 import { useModal } from "../../providers/Modal/ModalProvider";
+import { CREATE_POST_COMMENT_MUTATION } from "../../graphql/mutations/create-post-comment";
+import { DELETE_POST_MUTATION } from "../../graphql/mutations/delete-post";
+import { FIND_POST_QUERY } from "../../graphql/queries/find-post";
 
 export interface PostProps {
   post: PostModelInterface;

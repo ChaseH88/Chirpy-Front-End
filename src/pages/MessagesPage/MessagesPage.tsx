@@ -6,11 +6,11 @@ import { MessageModelInterface } from "../../types/interfaces";
 import { useLayoutEffect, useState } from "react";
 import { Inbox } from "../../components/Inbox";
 import { useQuery } from "@apollo/client";
-import { SEARCH_QUERY } from "./queries";
 import { useForm } from "react-hook-form";
 import { Form, FormInput } from "../../components/Form";
 import { useNavigate } from "react-router-dom";
 import { QUERY_PARAM } from "../../components/Inbox/Inbox";
+import { SEARCH_QUERY } from "../../graphql/queries/search-all-users";
 
 const normalizeMessages = (
   messages: MessageModelInterface[] | undefined,

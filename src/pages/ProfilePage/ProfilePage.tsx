@@ -9,15 +9,16 @@ import {
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client";
-import { GET_USER_BY_USERNAME_QUERY } from "./queries";
 import { UserProfilePhoto } from "../../components/UserProfilePhoto";
 import { Posts } from "../../components/Posts/Posts";
 import { useMemo, useState } from "react";
-import { EDIT_USER_MUTATION, FOLLOW_USER } from "./mutations";
 import { useSnackbar } from "notistack";
-import { CURRENT_USER_QUERY } from "../../providers/AppData/queries";
-import { GET_DASHBOARD_POSTS } from "../DashboardPage/queries";
 import { useForm } from "react-hook-form";
+import { GET_USER_BY_USERNAME_QUERY } from "../../graphql/queries/get-user-by-username";
+import { FOLLOW_USER } from "../../graphql/mutations/follow-user";
+import { EDIT_USER_MUTATION } from "../../graphql/mutations/edit-user";
+import { CURRENT_USER_QUERY } from "../../graphql/queries/current-user";
+import { GET_DASHBOARD_POSTS } from "../../graphql/queries/get-dashboard-posts";
 
 const ProfilePage = () => {
   const { currentUser } = useAppData();
@@ -34,8 +35,7 @@ const ProfilePage = () => {
   });
 
   const [followUser, { loading: followUserLoad }] = useMutation(FOLLOW_USER);
-  const [editUser, { loading: editUserLoading }] =
-    useMutation(EDIT_USER_MUTATION);
+  const [editUser] = useMutation(EDIT_USER_MUTATION);
 
   const handleFollowUser = async (id: string) => {
     const res = await followUser({

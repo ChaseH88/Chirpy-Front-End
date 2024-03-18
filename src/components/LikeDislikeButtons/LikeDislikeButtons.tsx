@@ -4,13 +4,14 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbDownOutlineIcon from "@mui/icons-material/ThumbDownOffAlt";
 import ThumbUpOutlineIcon from "@mui/icons-material/ThumbUpOffAlt";
-import { LIKE_POST_MUTATION, DISLIKE_POST_MUTATION } from "./mutations";
 import { useAppData } from "../../hooks/useAppData";
-import { GET_DASHBOARD_POSTS } from "../../pages/DashboardPage/queries";
 import { PostModelInterface } from "../../types/interfaces";
 import { useSnackbar } from "notistack";
-import { FIND_POST_QUERY } from "../../pages/FindPostPage/queries";
 import { useParams } from "react-router-dom";
+import { GET_DASHBOARD_POSTS } from "../../graphql/queries/get-dashboard-posts";
+import { FIND_POST_QUERY } from "../../graphql/queries/find-post";
+import { LIKE_POST_MUTATION } from "../../graphql/mutations/like-post";
+import { DISLIKE_POST_MUTATION } from "../../graphql/mutations/dislike-post";
 
 export interface LikeDislikeButtonsProps
   extends Pick<PostModelInterface, "likes" | "dislikes" | "postedBy" | "id"> {}

@@ -5,10 +5,10 @@ import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
 import { Box, Typography } from "@mui/material";
 import { useEffect } from "react";
-import { EDIT_USER_MUTATION } from "./mutations";
 import { icons } from "../../components/UserProfilePhoto";
 import { useSnackbar } from "notistack";
-import { CURRENT_USER_QUERY } from "../../providers/AppData/queries";
+import { EDIT_USER_MUTATION } from "../../graphql/mutations/edit-user";
+import { CURRENT_USER_QUERY } from "../../graphql/queries/current-user";
 
 type FormDataType = {
   username: string;

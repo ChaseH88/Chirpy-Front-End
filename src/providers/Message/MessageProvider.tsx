@@ -1,15 +1,15 @@
 import { MessageModelInterface } from "../../types/interfaces";
 import { FetchResult, useMutation, useSubscription } from "@apollo/client";
-import { MESSAGE_SUBSCRIPTION } from "./subscription";
 import { useAuth } from "../../hooks/useAuth";
 import { useSnackbar } from "notistack";
 import { useAppData } from "../../hooks/useAppData";
 import { createContext } from "react";
-import { SEND_MESSAGE_MUTATION } from "./mutations";
-import { CURRENT_USER_QUERY } from "../AppData/queries";
 import { Box, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { QUERY_PARAM } from "../../components/Inbox/Inbox";
+import { MESSAGE_SUBSCRIPTION } from "../../graphql/subscriptions/new-message";
+import { SEND_MESSAGE_MUTATION } from "../../graphql/mutations/send-message";
+import { CURRENT_USER_QUERY } from "../../graphql/queries/current-user";
 
 export interface MessageContextInterface {
   messages?: MessageModelInterface[];

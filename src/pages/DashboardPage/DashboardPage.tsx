@@ -1,8 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
-import { GET_DASHBOARD_POSTS } from "./queries";
 import { useAppData } from "../../hooks/useAppData";
 import { Posts } from "../../components/Posts/Posts";
-import { CREATE_POST_MUTATION } from "./mutations";
 import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
@@ -11,7 +9,9 @@ import { Trending } from "../../components/Trending";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSnackbar } from "notistack";
 import { Editor } from "../../components/Editor";
-import { CURRENT_USER_QUERY } from "../../providers/AppData/queries";
+import { GET_DASHBOARD_POSTS } from "../../graphql/queries/get-dashboard-posts";
+import { CREATE_POST_MUTATION } from "../../graphql/mutations/create-post";
+import { CURRENT_USER_QUERY } from "../../graphql/queries/current-user";
 
 export const POST_LIMIT = 20;
 
