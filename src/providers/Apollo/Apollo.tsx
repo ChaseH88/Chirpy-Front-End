@@ -11,8 +11,14 @@ import { auth } from "./auth";
 import { BASE_URL } from "./constants";
 import { link as socketLink } from "./SSELink";
 import { getMainDefinition } from "@apollo/client/utilities";
+import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
-const httpLink = new HttpLink({ uri: `http://${BASE_URL}/graphql` });
+const httpLink = createUploadLink({
+  uri: `http://${BASE_URL}/graphql`,
+  headers: {
+    ...auth(),
+  },
+});
 const authMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext({
     headers: {

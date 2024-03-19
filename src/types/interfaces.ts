@@ -11,6 +11,7 @@ export interface UserModelInterface {
   followers: UserModelInterface[];
   following: UserModelInterface[];
   blocked: UserModelInterface[];
+  images: ImageModelInterface[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,5 +44,16 @@ export interface MessageModelInterface {
   likes: UserModelInterface[];
   dislikes: UserModelInterface[];
   createdAt: string;
+  updatedAt: Date;
+}
+
+export interface ImageModelInterface {
+  id: string;
+  name: string;
+  imageUrl: string;
+  thumbnailUrl: string;
+  deleteUrl: string;
+  size: number;
+  createdAt: Date;
   updatedAt: Date;
 }

@@ -19,6 +19,9 @@ import { FOLLOW_USER } from "../../graphql/mutations/follow-user";
 import { EDIT_USER_MUTATION } from "../../graphql/mutations/edit-user";
 import { CURRENT_USER_QUERY } from "../../graphql/queries/current-user";
 import { GET_DASHBOARD_POSTS } from "../../graphql/queries/get-dashboard-posts";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import { useModal } from "../../providers/Modal/ModalProvider";
+import { ImageManager } from "../../components/ImageManager";
 
 const ProfilePage = () => {
   const { currentUser } = useAppData();
@@ -36,6 +39,7 @@ const ProfilePage = () => {
 
   const [followUser, { loading: followUserLoad }] = useMutation(FOLLOW_USER);
   const [editUser] = useMutation(EDIT_USER_MUTATION);
+  const { showModal } = useModal();
 
   const handleFollowUser = async (id: string) => {
     const res = await followUser({
@@ -74,6 +78,10 @@ const ProfilePage = () => {
     } catch (error) {
       enqueueSnackbar("Something went wrong", { variant: "error" });
     }
+  };
+
+  const handleOpenImageModal = () => {
+    showModal(<ImageManager />);
   };
 
   const isCurrentUser = useMemo(
@@ -116,7 +124,37 @@ const ProfilePage = () => {
                       display="flex"
                       justifyContent="center"
                     >
-                      <UserProfilePhoto icon={data?.findUserByUsername.photo} />
+                      <Box position={"relative"} display={"inline-block"}>
+                        <UserProfilePhoto
+                          icon={data?.findUserByUsername.photo}
+                        />
+                        {showEditProfile && (
+                          <Box
+                            className="icon"
+                            sx={{
+                              position: "absolute",
+                              bottom: 0,
+                              right: 0,
+                              borderRadius: "50%",
+                              cursor: "pointer",
+                              backgroundColor: "#ffffff70",
+                              height: "100%",
+                              width: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              "& svg": {
+                                color: "#000",
+                                height: 50,
+                                width: 50,
+                              },
+                            }}
+                            onClick={handleOpenImageModal}
+                          >
+                            <PhotoCameraIcon />
+                          </Box>
+                        )}
+                      </Box>
                     </Box>
                     <Box
                       flex={"1 1 100%"}
