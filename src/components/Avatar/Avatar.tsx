@@ -1,10 +1,11 @@
 import { Box, Button, Typography } from "@mui/material";
 import { UserModelInterface } from "../../types/interfaces";
 import { useNavigate } from "react-router-dom";
-import { useMemo } from "react";
+import { isValidElement, useMemo } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { UserProfilePhoto } from "../UserProfilePhoto";
 import { useAppData } from "../../hooks/useAppData";
+import { useMessages } from "../../hooks/useMessages";
 
 interface AvatarProps {
   user: UserModelInterface;
@@ -19,7 +20,16 @@ interface AvatarProps {
 export const Avatar = ({ user, buttons }: AvatarProps) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { messages } = useMessages();
   const { currentUser } = useAppData();
+  const unreadMessages = useMemo(
+    () =>
+      messages?.filter(
+        (message) =>
+          !message.hasRead && (message as any).toId?.id === currentUser?.id
+      )?.length || 0,
+    [messages, currentUser]
+  );
 
   const _buttons = useMemo(
     () => [
@@ -30,10 +40,33 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
         onClick: () => navigate("/dashboard"),
       },
       {
-        variant: "text",
-        color: "primary",
-        text: "Messages",
-        onClick: () => navigate("/messages"),
+        text: (
+          <Box
+            key={"messages"}
+            borderBottom={1}
+            borderColor={"rgba(0, 0, 0, 0.2)"}
+            padding={1}
+          >
+            <Button color={"primary"} onClick={() => navigate("/messages")}>
+              Messages
+              {unreadMessages > 0 && (
+                <Box
+                  ml={1}
+                  borderRadius={"50%"}
+                  bgcolor={"primary.main"}
+                  color={"white"}
+                  height={23}
+                  width={23}
+                  display={"flex"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                >
+                  {unreadMessages}
+                </Box>
+              )}
+            </Button>
+          </Box>
+        ),
       },
       {
         variant: "text",
@@ -108,18 +141,22 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
         justifyContent={"flex-start"}
         width={"100%"}
       >
-        {_buttons.map((button: any, index) => (
-          <Box
-            key={index}
-            borderBottom={index === _buttons.length - 1 ? 0 : 1}
-            borderColor={"rgba(0, 0, 0, 0.2)"}
-            padding={1}
-          >
-            <Button color={button.color} onClick={button.onClick}>
-              {button.text}
-            </Button>
-          </Box>
-        ))}
+        {_buttons.map((button: any, index) =>
+          isValidElement(button.text) ? (
+            button.text
+          ) : (
+            <Box
+              key={index}
+              borderBottom={index === _buttons.length - 1 ? 0 : 1}
+              borderColor={"rgba(0, 0, 0, 0.2)"}
+              padding={1}
+            >
+              <Button color={button.color} onClick={button.onClick}>
+                {button.text}
+              </Button>
+            </Box>
+          )
+        )}
       </Box>
     </Box>
   );

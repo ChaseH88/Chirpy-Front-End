@@ -49,13 +49,33 @@ export const Inbox = ({ messages }: InboxProps): JSX.Element => {
     };
   }, [navigate]);
 
-  const setExpandedFromQueryParam = useCallback(() => {
+  const handleReadMessages = useCallback(
+    async (messageIds: string[]) => {
+      await readMessages({
+        variables: {
+          messageIds,
+        },
+        refetchQueries: [CURRENT_USER_QUERY],
+      });
+    },
+    [readMessages]
+  );
+
+  const setExpandedFromQueryParam = useCallback(async () => {
     const params = new URLSearchParams(window.location.search);
     const fromUser = params.get(QUERY_PARAM);
     if (fromUser) {
       setExpandedItem(fromUser);
+
+      const unreadMessages = messages[fromUser].filter(
+        (message) => message.fromId.id !== currentUser?.id && !message.hasRead
+      );
+
+      if (unreadMessages.length > 0) {
+        await handleReadMessages(unreadMessages.map((message) => message.id));
+      }
     }
-  }, []);
+  }, [messages, handleReadMessages, currentUser]);
 
   useLayoutEffect(() => {
     setExpandedFromQueryParam();
@@ -77,15 +97,6 @@ export const Inbox = ({ messages }: InboxProps): JSX.Element => {
         navigate("/messages");
       }
     };
-
-  const handleReadMessages = async (messageIds: string[]) => {
-    await readMessages({
-      variables: {
-        messageIds,
-      },
-      refetchQueries: [CURRENT_USER_QUERY],
-    });
-  };
 
   return (
     <Box>
