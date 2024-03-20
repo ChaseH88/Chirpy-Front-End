@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
 import { Box, Typography } from "@mui/material";
 import { useEffect } from "react";
-import { icons } from "../../components/UserProfilePhoto";
 import { useSnackbar } from "notistack";
 import { EDIT_USER_MUTATION } from "../../graphql/mutations/edit-user";
 import { CURRENT_USER_QUERY } from "../../graphql/queries/current-user";
@@ -86,17 +85,6 @@ const EditUserPage = () => {
       placeholder: "Enter your bio",
       required: false,
       label: "Bio",
-    },
-    {
-      name: "photo",
-      type: "select",
-      placeholder: "Enter your photo",
-      required: false,
-      label: "Photo",
-      options: Object.keys(icons).map((key) => ({
-        id: key,
-        label: key.charAt(0).toUpperCase() + key.slice(1),
-      })),
     },
   ];
 

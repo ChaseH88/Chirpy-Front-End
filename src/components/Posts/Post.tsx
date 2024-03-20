@@ -178,11 +178,10 @@ export const Post = ({
         >
           <>
             <UserProfilePhoto
-              icon={post.postedBy.photo as any}
+              src={post.postedBy.photo as any}
+              name={post.postedBy.username}
               width={18}
               height={18}
-              svgHeight={12}
-              svgWidth={12}
             />
 
             <Typography variant="body2" ml={1}>
@@ -236,11 +235,10 @@ export const Post = ({
         <Box display="flex" alignItems="center">
           <Box mr={1}>
             <UserProfilePhoto
-              icon={post.postedBy.photo as any}
+              src={post.postedBy.photo as any}
+              name={post.postedBy.username}
               width={18}
               height={18}
-              svgHeight={12}
-              svgWidth={12}
             />
           </Box>
           <UserHoverMenu user={post.postedBy}>

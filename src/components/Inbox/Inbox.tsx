@@ -123,15 +123,18 @@ export const Inbox = ({ messages }: InboxProps): JSX.Element => {
                   >
                     <Box>
                       <UserProfilePhoto
-                        icon={
+                        src={
                           currentUser?.id !== messages[key][0]?.fromId?.id
                             ? messages[key][0]?.fromId?.photo
                             : (messages[key][0]?.toId?.photo as any)
                         }
+                        name={
+                          currentUser?.id !== messages[key][0]?.fromId?.id
+                            ? messages[key][0]?.fromId?.username
+                            : (messages[key][0]?.toId?.username as any)
+                        }
                         height={30}
-                        svgHeight={20}
                         width={30}
-                        svgWidth={20}
                       />
                     </Box>
                     <Box>

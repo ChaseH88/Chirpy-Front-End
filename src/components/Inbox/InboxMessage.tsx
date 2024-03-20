@@ -69,11 +69,10 @@ export const InboxMessage = ({
         <Box sx={styles[variant || "default"].container}>
           <Box>
             <UserProfilePhoto
-              icon={message.fromId?.photo as any}
+              src={message.fromId?.photo as any}
+              name={message.fromId?.username}
               height={30}
               width={30}
-              svgHeight={20}
-              svgWidth={20}
             />
           </Box>
           <Box>

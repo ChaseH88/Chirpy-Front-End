@@ -3,7 +3,7 @@ import { UserModelInterface } from "../../types/interfaces";
 import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { IconType, UserProfilePhoto } from "../UserProfilePhoto";
+import { UserProfilePhoto } from "../UserProfilePhoto";
 import { useAppData } from "../../hooks/useAppData";
 
 interface AvatarProps {
@@ -70,7 +70,7 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
       width={"100%"}
       borderRadius={2}
     >
-      <UserProfilePhoto icon={user.photo as IconType} />
+      <UserProfilePhoto src={user.photo} name={user.username} />
       {(user.firstName || user.lastName) && (
         <Box
           mb={1}

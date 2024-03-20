@@ -4,14 +4,22 @@ import { UPLOAD_IMAGE_MUTATION } from "../../graphql/mutations/upload-image";
 import { useMemo, useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { CURRENT_USER_QUERY } from "../../graphql/queries/current-user";
+import { ModalContextType } from "../../providers/Modal/ModalProvider";
+import { DELETE_IMAGE_MUTATION } from "../../graphql/mutations/delete-image";
+import { useSnackbar } from "notistack";
+import { EDIT_USER_MUTATION } from "../../graphql/mutations/edit-user";
 
-interface ImageManagerProps {}
+interface ImageManagerProps
+  extends Partial<Pick<ModalContextType, "hideModal">> {}
 
-export const ImageManager = (_: ImageManagerProps) => {
+export const ImageManager = ({ hideModal }: ImageManagerProps) => {
   const [uploadImage] = useMutation(UPLOAD_IMAGE_MUTATION);
+  const [deleteImage] = useMutation(DELETE_IMAGE_MUTATION);
+  const [editUser] = useMutation(EDIT_USER_MUTATION);
   const { currentUser } = useAppData();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showUpload, setShowUpload] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const images = useMemo(() => currentUser?.images || [], [currentUser]);
 
@@ -24,18 +32,61 @@ export const ImageManager = (_: ImageManagerProps) => {
         },
         refetchQueries: [{ query: CURRENT_USER_QUERY }],
       });
+      setShowUpload(false);
     }
   };
 
   const handleSetProfilePhoto = async (id: string) => {
-    console.log("Setting profile photo to", id);
+    if (id === currentUser?.photo) {
+      enqueueSnackbar(`This is already your profile photo.`, {
+        variant: "info",
+      });
+      return;
+    }
+    try {
+      const res = await editUser({
+        variables: {
+          id: currentUser!.id,
+          data: {
+            photo: images.find((image) => image.id === id)?.imageUrl,
+          },
+        },
+        refetchQueries: [{ query: CURRENT_USER_QUERY }],
+      });
+      enqueueSnackbar(res.data?.editUser, { variant: "success" });
+      hideModal?.();
+    } catch {
+      enqueueSnackbar(
+        `There was an error setting the profile photo. Please try again.`,
+        { variant: "error" }
+      );
+    }
   };
 
   const handleDelete = async (id: string) => {
-    console.log("Deleting image with id", id);
+    if (id === currentUser?.photo) {
+      enqueueSnackbar(`You can't delete your profile photo.`, {
+        variant: "info",
+      });
+      return;
+    }
+    try {
+      const res = await deleteImage({
+        variables: {
+          imageId: id,
+        },
+        refetchQueries: [{ query: CURRENT_USER_QUERY }],
+      });
+      setSelectedImage(null);
+      enqueueSnackbar(res.data?.deleteImage, { variant: "success" });
+    } catch {
+      enqueueSnackbar(
+        `There was an error deleting the image. Please try again.`,
+        { variant: "error" }
+      );
+    }
   };
 
-  console.log(selectedImage);
   return (
     <Box>
       <Box className="container" minWidth={"500px"}>

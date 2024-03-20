@@ -45,11 +45,10 @@ export const UserHoverMenu = ({
                   justifyContent="center"
                 >
                   <UserProfilePhoto
-                    icon={photo as any}
+                    src={photo as any}
+                    name={username}
                     height={18}
                     width={18}
-                    svgHeight={14}
-                    svgWidth={14}
                   />
                   <Typography
                     variant="h6"

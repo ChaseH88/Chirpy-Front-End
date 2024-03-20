@@ -126,7 +126,8 @@ const ProfilePage = () => {
                     >
                       <Box position={"relative"} display={"inline-block"}>
                         <UserProfilePhoto
-                          icon={data?.findUserByUsername.photo}
+                          src={data?.findUserByUsername.photo}
+                          name={data?.findUserByUsername.username}
                         />
                         {showEditProfile && (
                           <Box

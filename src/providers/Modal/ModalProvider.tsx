@@ -11,7 +11,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-interface ModalContextType {
+export interface ModalContextType {
   showModal: (content: ReactNode) => void;
   hideModal: () => void;
 }
