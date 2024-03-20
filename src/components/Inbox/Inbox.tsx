@@ -18,6 +18,9 @@ import { useNavigate } from "react-router-dom";
 import { useAppData } from "../../hooks/useAppData";
 import { UserProfilePhoto } from "../UserProfilePhoto";
 import moment from "moment";
+import { useMutation } from "@apollo/client";
+import { READ_MESSAGES_MUTATION } from "../../graphql/mutations/read-messages";
+import { CURRENT_USER_QUERY } from "../../graphql/queries/current-user";
 
 interface InboxProps {
   messages: {
@@ -31,6 +34,7 @@ export const Inbox = ({ messages }: InboxProps): JSX.Element => {
   const [expandedItem, setExpandedItem] = useState<string>("");
   const navigate = useNavigate();
   const { currentUser } = useAppData();
+  const [readMessages] = useMutation(READ_MESSAGES_MUTATION);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -74,110 +78,139 @@ export const Inbox = ({ messages }: InboxProps): JSX.Element => {
       }
     };
 
+  const handleReadMessages = async (messageIds: string[]) => {
+    await readMessages({
+      variables: {
+        messageIds,
+      },
+      refetchQueries: [CURRENT_USER_QUERY],
+    });
+  };
+
   return (
     <Box>
       {Object.keys(messages).length > 0 && (
         <Box mb={4}>
-          {Object.keys(messages).map((key) => (
-            <Accordion
-              key={key}
-              expanded={expandedItem === key}
-              onChange={handleExpandChange(key)}
-              sx={{
-                backgroundColor: "#f2f2f2",
-                marginBottom: 2,
-                '[class*="expandIconWrapper"]': {
-                  transition: "none !important",
-                },
-              }}
-              slotProps={{
-                transition: {
-                  timeout: 0,
-                },
-              }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls={`panel-${key}-content`}
-                id={`panel-${key}-header`}
+          {Object.keys(messages).map((key) => {
+            const unreadMessagesCount = messages[key].filter(
+              (message) =>
+                message.fromId.id !== currentUser?.id && !message.hasRead
+            ).length;
+            return (
+              <Accordion
+                key={key}
+                expanded={expandedItem === key}
+                onChange={async (_event, isExpanded) => {
+                  if (isExpanded) {
+                    await handleReadMessages(
+                      messages[key].map((message) => message.id)
+                    );
+                  }
+                  handleExpandChange(key)(_event, isExpanded);
+                }}
                 sx={{
-                  height: 50,
-                  "&.Mui-expanded": {
-                    height: 50,
-                    minHeight: 50,
+                  backgroundColor: "#f2f2f2",
+                  marginBottom: 2,
+                  '[class*="expandIconWrapper"]': {
+                    transition: "none !important",
+                  },
+                }}
+                slotProps={{
+                  transition: {
+                    timeout: 0,
                   },
                 }}
               >
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  gap={2}
-                  width="100%"
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls={`panel-${key}-content`}
+                  id={`panel-${key}-header`}
+                  sx={{
+                    height: 50,
+                    "&.Mui-expanded": {
+                      height: 50,
+                      minHeight: 50,
+                    },
+                  }}
                 >
                   <Box
                     display="flex"
                     alignItems="center"
                     justifyContent="space-between"
                     gap={2}
+                    width="100%"
                   >
-                    <Box>
-                      <UserProfilePhoto
-                        src={
-                          currentUser?.id !== messages[key][0]?.fromId?.id
-                            ? messages[key][0]?.fromId?.photo
-                            : (messages[key][0]?.toId?.photo as any)
-                        }
-                        name={
-                          currentUser?.id !== messages[key][0]?.fromId?.id
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      gap={2}
+                    >
+                      <Box>
+                        <UserProfilePhoto
+                          src={
+                            currentUser?.id !== messages[key][0]?.fromId?.id
+                              ? messages[key][0]?.fromId?.photo
+                              : (messages[key][0]?.toId?.photo as any)
+                          }
+                          name={
+                            currentUser?.id !== messages[key][0]?.fromId?.id
+                              ? messages[key][0]?.fromId?.username
+                              : (messages[key][0]?.toId?.username as any)
+                          }
+                          height={30}
+                          width={30}
+                        />
+                      </Box>
+                      <Box>
+                        <Typography>
+                          {currentUser?.id !== messages[key][0]?.fromId?.id
                             ? messages[key][0]?.fromId?.username
-                            : (messages[key][0]?.toId?.username as any)
-                        }
-                        height={30}
-                        width={30}
-                      />
+                            : messages[key][0].toId?.username}
+                        </Typography>
+                      </Box>
                     </Box>
-                    <Box>
-                      <Typography>
-                        {currentUser?.id !== messages[key][0]?.fromId?.id
-                          ? messages[key][0]?.fromId?.username
-                          : messages[key][0].toId?.username}
+                    <Box mr={2}>
+                      <Typography variant="body2" fontStyle="italic">
+                        Last message sent on{" "}
+                        <b>
+                          {moment(
+                            parseInt(
+                              messages[key][messages[key].length - 1]?.createdAt
+                            )
+                          ).format("MM DD YY, h:mm:ss a")}
+                        </b>
+                        {" by"}
+                        <b>
+                          {messages[key][messages[key].length - 1]?.fromId
+                            ?.id === currentUser?.id
+                            ? " you"
+                            : ` ${
+                                messages[key][messages[key].length - 1]?.fromId
+                                  ?.username
+                              }`}
+                        </b>
                       </Typography>
+                      {unreadMessagesCount > 0 && (
+                        <Box className="unread-messages-count">
+                          <Typography variant="body2" color="error">
+                            {unreadMessagesCount} unread
+                          </Typography>
+                        </Box>
+                      )}
                     </Box>
                   </Box>
-                  <Box mr={2}>
-                    <Typography variant="body2" fontStyle="italic">
-                      Last message sent on{" "}
-                      <b>
-                        {moment(
-                          parseInt(
-                            messages[key][messages[key].length - 1]?.createdAt
-                          )
-                        ).format("MM DD YY, h:mm:ss a")}
-                      </b>
-                      {" by"}
-                      <b>
-                        {messages[key][messages[key].length - 1]?.fromId?.id ===
-                        currentUser?.id
-                          ? " you"
-                          : ` ${
-                              messages[key][messages[key].length - 1]?.fromId
-                                ?.username
-                            }`}
-                      </b>
-                    </Typography>
-                  </Box>
-                </Box>
-              </AccordionSummary>
-              <AccordionDetails>
-                <InboxItem
-                  messages={messages[key]}
-                  numToShow={9999}
-                  variant="default"
-                />
-              </AccordionDetails>
-            </Accordion>
-          ))}
+                </AccordionSummary>
+                <AccordionDetails>
+                  <InboxItem
+                    messages={messages[key]}
+                    numToShow={9999}
+                    variant="default"
+                  />
+                </AccordionDetails>
+              </Accordion>
+            );
+          })}
         </Box>
       )}
     </Box>

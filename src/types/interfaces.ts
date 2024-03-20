@@ -43,6 +43,8 @@ export interface MessageModelInterface {
   content: string;
   likes: UserModelInterface[];
   dislikes: UserModelInterface[];
+  hasRead: boolean;
+  readAt: Date;
   createdAt: string;
   updatedAt: Date;
 }

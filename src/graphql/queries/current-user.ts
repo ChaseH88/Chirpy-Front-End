@@ -60,6 +60,8 @@ export const CURRENT_USER_QUERY = gql`
       messages {
         id
         content
+        hasRead
+        readAt
         fromId {
           id
           username
