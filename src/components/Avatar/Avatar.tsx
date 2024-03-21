@@ -31,6 +31,12 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
     [messages, currentUser]
   );
 
+  const fullName = useMemo(
+    () =>
+      `${currentUser?.firstName || ""} ${currentUser?.lastName || ""}`.trim(),
+    [currentUser]
+  );
+
   const memoButtons = useMemo(
     () =>
       buttons || [
@@ -104,7 +110,13 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
       width={"100%"}
       borderRadius={2}
     >
-      <UserProfilePhoto src={user.photo} name={user.username} />
+      <Box mb={1}>
+        <UserProfilePhoto
+          src={user.photo}
+          name={user.username}
+          onClick={() => navigate(`/profile/${user.username}`)}
+        />
+      </Box>
       {(user.firstName || user.lastName) && (
         <Box
           mb={1}
@@ -118,15 +130,13 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
       )}
       <Box display={"flex"} flexDirection={"row"} alignItems={"center"} gap={1}>
         <Typography variant="body1" fontSize={12}>
-          {user.firstName} {user.lastName}
+          {fullName}
+          {!!fullName?.length && " - "}
         </Typography>
-        -
-        {user.posts?.length ? (
+        {!!user.posts?.length && (
           <Typography variant="body1" fontSize={12}>
             {user.posts.length} Post{user.posts.length > 1 ? "s" : ""}
           </Typography>
-        ) : (
-          <Typography variant="h6">Create a post!</Typography>
         )}
       </Box>
       <Box mt={1}>

@@ -28,6 +28,7 @@ export const UserProfilePhoto = ({
       alignItems: "center",
       justifyContent: "center",
       overflow: "hidden",
+      cursor: "pointer",
       "& img": {
         maxWidth: "100%",
       },
