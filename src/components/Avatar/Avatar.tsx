@@ -31,63 +31,64 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
     [messages, currentUser]
   );
 
-  const _buttons = useMemo(
-    () => [
-      {
-        variant: "text",
-        color: "primary",
-        text: "Home",
-        onClick: () => navigate("/dashboard"),
-      },
-      {
-        text: (
-          <Box
-            key={"messages"}
-            borderBottom={1}
-            borderColor={"rgba(0, 0, 0, 0.2)"}
-            padding={1}
-          >
-            <Button color={"primary"} onClick={() => navigate("/messages")}>
-              Messages
-              {unreadMessages > 0 && (
-                <Box
-                  ml={1}
-                  borderRadius={"50%"}
-                  bgcolor={"primary.main"}
-                  color={"white"}
-                  height={23}
-                  width={23}
-                  display={"flex"}
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                >
-                  {unreadMessages}
-                </Box>
-              )}
-            </Button>
-          </Box>
-        ),
-      },
-      {
-        variant: "text",
-        color: "primary",
-        text: "Trending",
-        onClick: () => navigate("/trending-posts"),
-      },
-      {
-        variant: "text",
-        color: "primary",
-        text: "Your Profile",
-        onClick: () => navigate(`/profile/${currentUser?.username}`),
-      },
-      {
-        variant: "outlined",
-        color: "secondary",
-        text: "Logout",
-        onClick: logout,
-      },
-    ],
-    [logout, navigate, currentUser]
+  const memoButtons = useMemo(
+    () =>
+      buttons || [
+        {
+          variant: "text",
+          color: "primary",
+          text: "Home",
+          onClick: () => navigate("/dashboard"),
+        },
+        {
+          text: (
+            <Box
+              key={"messages"}
+              borderBottom={1}
+              borderColor={"rgba(0, 0, 0, 0.2)"}
+              padding={1}
+            >
+              <Button color={"primary"} onClick={() => navigate("/messages")}>
+                Messages
+                {unreadMessages > 0 && (
+                  <Box
+                    ml={1}
+                    borderRadius={"50%"}
+                    bgcolor={"primary.main"}
+                    color={"white"}
+                    height={23}
+                    width={23}
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                  >
+                    {unreadMessages}
+                  </Box>
+                )}
+              </Button>
+            </Box>
+          ),
+        },
+        {
+          variant: "text",
+          color: "primary",
+          text: "Trending",
+          onClick: () => navigate("/trending-posts"),
+        },
+        {
+          variant: "text",
+          color: "primary",
+          text: "Your Profile",
+          onClick: () => navigate(`/profile/${currentUser?.username}`),
+        },
+        {
+          variant: "outlined",
+          color: "secondary",
+          text: "Logout",
+          onClick: logout,
+        },
+      ],
+    [logout, navigate, currentUser, unreadMessages, buttons]
   );
 
   return (
@@ -141,13 +142,13 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
         justifyContent={"flex-start"}
         width={"100%"}
       >
-        {_buttons.map((button: any, index) =>
+        {memoButtons.map((button: any, index) =>
           isValidElement(button.text) ? (
             button.text
           ) : (
             <Box
               key={index}
-              borderBottom={index === _buttons.length - 1 ? 0 : 1}
+              borderBottom={index === memoButtons.length - 1 ? 0 : 1}
               borderColor={"rgba(0, 0, 0, 0.2)"}
               padding={1}
             >
