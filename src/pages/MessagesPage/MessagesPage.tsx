@@ -5,12 +5,14 @@ import { useMessages } from "../../hooks/useMessages";
 import { MessageModelInterface } from "../../types/interfaces";
 import { useLayoutEffect, useState } from "react";
 import { Inbox } from "../../components/Inbox";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { Form, FormInput } from "../../components/Form";
 import { useNavigate } from "react-router-dom";
 import { QUERY_PARAM } from "../../components/Inbox/Inbox";
 import { SEARCH_QUERY } from "../../graphql/queries/search-all-users";
+import { READ_MESSAGES_MUTATION } from "../../graphql/mutations/read-messages";
+import { CURRENT_USER_QUERY } from "../../graphql/queries/current-user";
 
 const normalizeMessages = (
   messages: MessageModelInterface[] | undefined,
@@ -62,6 +64,7 @@ const MessagesPage = () => {
   const { data } = useQuery(SEARCH_QUERY);
   const { messages: messagesArr } = useMessages();
   const navigate = useNavigate();
+  const [readMessages] = useMutation(READ_MESSAGES_MUTATION);
   const formHook = useForm({
     defaultValues: {
       content: "",
@@ -83,6 +86,20 @@ const MessagesPage = () => {
     formHook.reset();
     setShowNewMessage(false);
     navigate(`/messages?${QUERY_PARAM}=${selectedUser}`);
+  };
+
+  const handleMarkAllAsRead = async () => {
+    const unreadMessages = messagesArr?.filter(
+      (message) => message.toId?.id === currentUser?.id && !message.hasRead
+    );
+    if (unreadMessages?.length) {
+      await readMessages({
+        variables: {
+          messageIds: unreadMessages.map((message) => message.id),
+        },
+        refetchQueries: [CURRENT_USER_QUERY],
+      });
+    }
   };
 
   const inputs: FormInput[] = [
@@ -116,7 +133,14 @@ const MessagesPage = () => {
                     Messages
                   </Typography>
                 </Box>
-                <Box>
+                <Box display="flex" gap={2}>
+                  <Button
+                    onClick={handleMarkAllAsRead}
+                    variant="outlined"
+                    color="primary"
+                  >
+                    Mark all as read
+                  </Button>
                   <Button
                     onClick={() => setShowNewMessage(true)}
                     variant="contained"
