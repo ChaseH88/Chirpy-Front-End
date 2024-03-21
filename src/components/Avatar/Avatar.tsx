@@ -1,9 +1,11 @@
 import { Box, Button, Typography } from "@mui/material";
 import { UserModelInterface } from "../../types/interfaces";
 import { useNavigate } from "react-router-dom";
-import { useMemo } from "react";
+import { isValidElement, useMemo } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { IconType, UserProfilePhoto } from "../UserProfilePhoto";
+import { UserProfilePhoto } from "../UserProfilePhoto";
+import { useAppData } from "../../hooks/useAppData";
+import { useMessages } from "../../hooks/useMessages";
 
 interface AvatarProps {
   user: UserModelInterface;
@@ -18,47 +20,81 @@ interface AvatarProps {
 export const Avatar = ({ user, buttons }: AvatarProps) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { messages } = useMessages();
+  const { currentUser } = useAppData();
+  const unreadMessages = useMemo(
+    () =>
+      messages?.filter(
+        (message) =>
+          !message.hasRead && (message as any).toId?.id === currentUser?.id
+      )?.length || 0,
+    [messages, currentUser]
+  );
 
-  const _buttons = useMemo(
-    () => [
-      {
-        variant: "text",
-        color: "primary",
-        text: "Search",
-        onClick: () => navigate("/search"),
-      },
-      {
-        variant: "text",
-        color: "primary",
-        text: "Your Posts",
-        onClick: () => navigate("/dashboard"),
-      },
-      {
-        variant: "text",
-        color: "primary",
-        text: "All Posts",
-        onClick: () => navigate("/dashboard"),
-      },
-      {
-        variant: "text",
-        color: "primary",
-        text: "Trending Posts",
-        onClick: () => navigate("/dashboard"),
-      },
-      {
-        variant: "text",
-        color: "primary",
-        text: "Edit Profile",
-        onClick: () => navigate("/edit-user"),
-      },
-      {
-        variant: "outlined",
-        color: "secondary",
-        text: "Logout",
-        onClick: logout,
-      },
-    ],
-    [logout, navigate]
+  const fullName = useMemo(
+    () =>
+      `${currentUser?.firstName || ""} ${currentUser?.lastName || ""}`.trim(),
+    [currentUser]
+  );
+
+  const memoButtons = useMemo(
+    () =>
+      buttons || [
+        {
+          variant: "text",
+          color: "primary",
+          text: "Home",
+          onClick: () => navigate("/dashboard"),
+        },
+        {
+          text: (
+            <Box
+              key={"messages"}
+              borderBottom={1}
+              borderColor={"rgba(0, 0, 0, 0.2)"}
+              padding={1}
+            >
+              <Button color={"primary"} onClick={() => navigate("/messages")}>
+                Messages
+                {unreadMessages > 0 && (
+                  <Box
+                    ml={1}
+                    borderRadius={"50%"}
+                    bgcolor={"primary.main"}
+                    color={"white"}
+                    height={23}
+                    width={23}
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                  >
+                    {unreadMessages}
+                  </Box>
+                )}
+              </Button>
+            </Box>
+          ),
+        },
+        {
+          variant: "text",
+          color: "primary",
+          text: "Trending",
+          onClick: () => navigate("/trending-posts"),
+        },
+        {
+          variant: "text",
+          color: "primary",
+          text: "Your Profile",
+          onClick: () => navigate(`/profile/${currentUser?.username}`),
+        },
+        {
+          variant: "outlined",
+          color: "secondary",
+          text: "Logout",
+          onClick: logout,
+        },
+      ],
+    [logout, navigate, currentUser, unreadMessages, buttons]
   );
 
   return (
@@ -74,23 +110,33 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
       width={"100%"}
       borderRadius={2}
     >
-      <UserProfilePhoto icon={user.photo as IconType} />
+      <Box mb={1}>
+        <UserProfilePhoto
+          src={user.photo}
+          name={user.username}
+          onClick={() => navigate(`/profile/${user.username}`)}
+        />
+      </Box>
       {(user.firstName || user.lastName) && (
-        <Box mb={1}>
+        <Box
+          mb={1}
+          sx={{
+            cursor: "pointer",
+          }}
+          onClick={() => navigate(`/profile/${user.username}`)}
+        >
           <Typography variant="h4">{user.username}</Typography>
         </Box>
       )}
       <Box display={"flex"} flexDirection={"row"} alignItems={"center"} gap={1}>
         <Typography variant="body1" fontSize={12}>
-          {user.firstName} {user.lastName}
+          {fullName}
+          {!!fullName?.length && " - "}
         </Typography>
-        -
-        {user.posts?.length ? (
+        {!!user.posts?.length && (
           <Typography variant="body1" fontSize={12}>
             {user.posts.length} Post{user.posts.length > 1 ? "s" : ""}
           </Typography>
-        ) : (
-          <Typography variant="h6">Create a post!</Typography>
         )}
       </Box>
       <Box mt={1}>
@@ -106,18 +152,22 @@ export const Avatar = ({ user, buttons }: AvatarProps) => {
         justifyContent={"flex-start"}
         width={"100%"}
       >
-        {_buttons.map((button: any, index) => (
-          <Box
-            key={index}
-            borderBottom={index === _buttons.length - 1 ? 0 : 1}
-            borderColor={"rgba(0, 0, 0, 0.2)"}
-            padding={1}
-          >
-            <Button color={button.color} onClick={button.onClick}>
-              {button.text}
-            </Button>
-          </Box>
-        ))}
+        {memoButtons.map((button: any, index) =>
+          isValidElement(button.text) ? (
+            button.text
+          ) : (
+            <Box
+              key={index}
+              borderBottom={index === memoButtons.length - 1 ? 0 : 1}
+              borderColor={"rgba(0, 0, 0, 0.2)"}
+              padding={1}
+            >
+              <Button color={button.color} onClick={button.onClick}>
+                {button.text}
+              </Button>
+            </Box>
+          )
+        )}
       </Box>
     </Box>
   );

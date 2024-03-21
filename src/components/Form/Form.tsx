@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   TextField,
   Button,
@@ -17,18 +17,20 @@ export interface FormInput {
   type: FormTypes;
   placeholder: string;
   required: boolean;
-  label: string;
+  label?: string | React.ReactNode;
   value?: string;
   options?: {
     id: string;
     label: string;
   }[];
+  hideLabel?: boolean;
 }
 
 export interface FormProps<T = any> {
   inputs: FormInput[];
   submitText: string;
   onSubmit: (data: T) => void;
+  onCancel?: () => void;
   isLoading?: boolean;
   formHook: UseFormReturn<any>;
   buttonPosition?: "center" | "right" | "left" | "full";
@@ -41,6 +43,7 @@ const Form = <T,>({
   isLoading,
   formHook: { control, handleSubmit },
   buttonPosition = "full",
+  onCancel,
 }: FormProps<T>) => {
   const buttonPositionStyle = {
     left: "flex-start",
@@ -48,6 +51,21 @@ const Form = <T,>({
     right: "flex-end",
     full: "center",
   }[buttonPosition];
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        (e.ctrlKey && e.key === "Enter") ||
+        (e.metaKey && e.key === "Enter")
+      ) {
+        handleSubmit(onSubmit)();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleSubmit, onSubmit]);
 
   const renderInput = (input: FormInput, index: number) => {
     return (
@@ -62,7 +80,7 @@ const Form = <T,>({
             case "select":
               return (
                 <FormControl fullWidth required={input.required}>
-                  <InputLabel>{input.label}</InputLabel>
+                  {!input.hideLabel && <InputLabel>{input.label}</InputLabel>}
                   <Select {...field} label={input.label}>
                     {input.options?.map((option, idx) => (
                       <MenuItem key={idx} value={option.id}>
@@ -82,6 +100,7 @@ const Form = <T,>({
                   placeholder={input.placeholder}
                   required={input.required}
                   label={input.label}
+                  hiddenLabel={input.hideLabel}
                 />
               );
             default:
@@ -93,6 +112,7 @@ const Form = <T,>({
                   placeholder={input.placeholder}
                   required={input.required}
                   label={input.label}
+                  hiddenLabel={input.hideLabel}
                 />
               );
           }
@@ -109,7 +129,17 @@ const Form = <T,>({
       <fieldset disabled={isLoading} style={{ border: "none" }}>
         <Box display="flex" flexDirection="column" gap={2}>
           {inputs.map(renderInput)}
-          <Box display="flex" justifyContent={buttonPositionStyle}>
+          <Box display="flex" justifyContent={buttonPositionStyle} gap={2}>
+            {onCancel && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={onCancel}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+            )}
             <Button type="submit" variant="contained" color="primary">
               {isLoading ? "Loading..." : submitText}
             </Button>

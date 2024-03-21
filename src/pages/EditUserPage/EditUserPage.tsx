@@ -5,11 +5,9 @@ import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
 import { Box, Typography } from "@mui/material";
 import { useEffect } from "react";
-import { Avatar } from "../../components/Avatar";
-import { EDIT_USER_MUTATION } from "./mutations";
-import { UserModelInterface } from "../../types/interfaces";
-import { icons } from "../../components/UserProfilePhoto";
 import { useSnackbar } from "notistack";
+import { EDIT_USER_MUTATION } from "../../graphql/mutations/edit-user";
+import { CURRENT_USER_QUERY } from "../../graphql/queries/current-user";
 
 type FormDataType = {
   username: string;
@@ -24,7 +22,7 @@ const EditUserPage = () => {
   const [editUser, { loading: editUserLoading }] =
     useMutation(EDIT_USER_MUTATION);
 
-  const { currentUser, setCurrentUser } = useAppData();
+  const { currentUser } = useAppData();
   const formHook = useForm({
     reValidateMode: "onChange",
   });
@@ -46,17 +44,13 @@ const EditUserPage = () => {
         return;
       }
 
-      const res = (await editUser({
+      await editUser({
         variables: {
           id: currentUser!.id,
           data,
         },
-      })) as {
-        data: {
-          editUser: UserModelInterface;
-        };
-      };
-      setCurrentUser(res.data.editUser);
+        refetchQueries: [CURRENT_USER_QUERY],
+      });
       enqueueSnackbar("Profile updated", { variant: "success" });
     } catch (error) {
       enqueueSnackbar("Something went wrong", { variant: "error" });
@@ -92,17 +86,6 @@ const EditUserPage = () => {
       required: false,
       label: "Bio",
     },
-    {
-      name: "photo",
-      type: "select",
-      placeholder: "Enter your photo",
-      required: false,
-      label: "Photo",
-      options: Object.keys(icons).map((key) => ({
-        id: key,
-        label: key.charAt(0).toUpperCase() + key.slice(1),
-      })),
-    },
   ];
 
   return (
@@ -133,11 +116,6 @@ const EditUserPage = () => {
               isLoading={editUserLoading}
             />
           </Box>
-        </Box>
-      )}
-      AvatarComponent={() => (
-        <Box>
-          <Avatar user={currentUser!} />
         </Box>
       )}
     />

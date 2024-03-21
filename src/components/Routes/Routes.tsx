@@ -7,6 +7,8 @@ import { useAuth } from "../../hooks/useAuth";
 import { EditUserPage } from "../../pages/EditUserPage";
 import { FindPostPage } from "../../pages/FindPostPage";
 import { SearchPage } from "../../pages/SearchPage";
+import { MessagesPage } from "../../pages/MessagesPage";
+import { ProfilePage } from "../../pages/ProfilePage";
 
 const Routes = (): JSX.Element => {
   const { isLoggedIn } = useAuth();
@@ -31,10 +33,10 @@ const Routes = (): JSX.Element => {
         }
       />
       <Route
-        path="/search"
+        path="/profile/:username"
         element={
           <ProtectedRoute>
-            <SearchPage />
+            <ProfilePage />
           </ProtectedRoute>
         }
       />
@@ -43,6 +45,22 @@ const Routes = (): JSX.Element => {
         element={
           <ProtectedRoute>
             <EditUserPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/search"
+        element={
+          <ProtectedRoute>
+            <SearchPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/messages"
+        element={
+          <ProtectedRoute>
+            <MessagesPage />
           </ProtectedRoute>
         }
       />

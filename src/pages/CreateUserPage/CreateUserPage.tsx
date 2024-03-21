@@ -1,12 +1,12 @@
 import { Form, FormInput } from "../../components/Form";
 import { useMutation } from "@apollo/client";
-import { CREATE_USER_MUTATION } from "./mutations";
 import { useForm } from "react-hook-form";
 import { UserModelInterface } from "../../types/interfaces";
 import { useAuth } from "../../hooks/useAuth";
 import { HomeLayout } from "../../components/HomeLayout";
 import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { CREATE_USER_MUTATION } from "../../graphql/mutations/create-user";
 
 const CreateUserPage = () => {
   const { login } = useAuth();
