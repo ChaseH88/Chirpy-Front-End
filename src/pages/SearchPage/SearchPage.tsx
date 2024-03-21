@@ -1,12 +1,11 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { SEARCH_QUERY, TRENDING_POSTS } from "./queries";
 import { useAppData } from "../../hooks/useAppData";
 import { Posts } from "../../components/Posts/Posts";
 import { Form, FormInput } from "../../components/Form";
 import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
-import { Avatar } from "../../components/Avatar";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { Trending } from "../../components/Trending";
 import { PostModelInterface, UserModelInterface } from "../../types/interfaces";
 import { useState } from "react";
@@ -23,7 +22,8 @@ const SearchPage = () => {
     users: [],
     posts: [],
   });
-  const { loading: trendingPostsLoading, data } = useQuery(TRENDING_POSTS);
+  const { loading: trendingPostsLoading, data: trendingPostsData } =
+    useQuery(TRENDING_POSTS);
   const { loading: searchLoading, refetch: searchRefetch } = useQuery(
     SEARCH_QUERY,
     {
@@ -137,17 +137,12 @@ const SearchPage = () => {
           </Box>
         </Box>
       )}
-      AvatarComponent={() => (
-        <Box>
-          <Avatar user={currentUser!} />
-        </Box>
-      )}
       TrendingComponent={() => (
         <Box mx={2}>
           {searchLoading ? (
             <CircularProgress variant="indeterminate" color="secondary" />
           ) : (
-            <Trending trendingPosts={data?.trendingPosts} />
+            <Trending trendingPosts={trendingPostsData?.trendingPosts} />
           )}
         </Box>
       )}

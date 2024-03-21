@@ -2,7 +2,6 @@ import {
   ApolloProvider as ApolloProviderDep,
   ApolloClient,
   InMemoryCache,
-  HttpLink,
   from,
   ApolloLink,
   split,
@@ -13,9 +12,6 @@ import { link as socketLink } from "./SSELink";
 import { getMainDefinition } from "@apollo/client/utilities";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
-<<<<<<< HEAD
-const BASE_URL = "http://localhost:4000/graphql";
-=======
 const httpLink = createUploadLink({
   uri: `http://${BASE_URL}/graphql`,
   headers: {
@@ -44,7 +40,6 @@ const link = split(
   socketLink,
   httpLinkWithMiddleware
 );
->>>>>>> master
 
 export const client = new ApolloClient({
   link,
