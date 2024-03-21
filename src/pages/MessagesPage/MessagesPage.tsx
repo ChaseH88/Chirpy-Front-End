@@ -138,6 +138,13 @@ const MessagesPage = () => {
                     onClick={handleMarkAllAsRead}
                     variant="outlined"
                     color="primary"
+                    disabled={
+                      !messagesArr?.some(
+                        (message) =>
+                          message.toId?.id === currentUser?.id &&
+                          !message.hasRead
+                      )
+                    }
                   >
                     Mark all as read
                   </Button>
