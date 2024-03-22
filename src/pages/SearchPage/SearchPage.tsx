@@ -1,94 +1,130 @@
 import { useQuery } from "@apollo/client";
-import { SEARCH_QUERY, TRENDING_POSTS } from "./queries";
-import { useAppData } from "../../hooks/useAppData";
+import { SEARCH_QUERY } from "../../graphql/queries/search-query";
 import { Posts } from "../../components/Posts/Posts";
-import { Form, FormInput } from "../../components/Form";
-import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../../components/DashboardLayout";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { Trending } from "../../components/Trending";
+import { useQueryParams } from "../../hooks/useQueryParams";
+import { SearchBar } from "../../components/SearchBar";
+import { ReactNode, isValidElement, useCallback, useMemo } from "react";
 import { PostModelInterface, UserModelInterface } from "../../types/interfaces";
-import { useState } from "react";
+import { UserProfilePhoto } from "../../components/UserProfilePhoto";
 
-type SearchResults = {
-  groups: any[];
-  users: UserModelInterface[];
-  posts: PostModelInterface[];
+interface SearchResultProps {
+  title: string;
+  content: string | ReactNode;
+  photo: string | ReactNode;
+  createdAt: string;
+}
+
+const SearchResult = ({ title, content, photo }: SearchResultProps) => {
+  return (
+    <Box
+      borderRadius={2}
+      p={2}
+      mx={3}
+      sx={{
+        backgroundColor: "white",
+      }}
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+    >
+      <Box flex="1 1 auto">
+        <Typography variant="h6">{title}</Typography>
+        {isValidElement(content) ? (
+          content
+        ) : (
+          <Typography variant="body1">{content}</Typography>
+        )}
+      </Box>
+      <Box>{photo}</Box>
+    </Box>
+  );
 };
 
 const SearchPage = () => {
-  const [state, setState] = useState<SearchResults>({
-    groups: [],
-    users: [],
-    posts: [],
-  });
-  const { loading: trendingPostsLoading, data: trendingPostsData } =
-    useQuery(TRENDING_POSTS);
-  const { loading: searchLoading, refetch: searchRefetch } = useQuery(
-    SEARCH_QUERY,
-    {
-      skip: true,
-    }
-  );
-  const { currentUser } = useAppData();
-  const formHook = useForm({
-    defaultValues: {
-      search: "",
+  const params = useQueryParams();
+
+  const { loading: searchLoading, data } = useQuery(SEARCH_QUERY, {
+    variables: {
+      search: params.query,
+      type: ["USER", "POST", "GROUP"],
     },
-    reValidateMode: "onChange",
+    skip: !params.query,
   });
 
-  const handleSubmit = async (data: { search: string }) => {
-    if (!data.search) {
-      alert("Please fill out the search field");
-      return;
+  const buildSearchResults = useCallback(() => {
+    const searchResults: SearchResultProps[] = [];
+    const users = data?.search?.users as UserModelInterface[];
+    const posts = data?.search?.posts as PostModelInterface[];
+    // const groups = data?.search?.groups as any[];
+
+    if (users) {
+      users.forEach((user) => {
+        searchResults.push({
+          title: user.username,
+          content: user.email,
+          photo: <UserProfilePhoto src={user.photo} name={user.username} />,
+          createdAt: new Date().toISOString(),
+        });
+      });
     }
-    try {
-      const res = (await searchRefetch({
-        search: data.search,
-        type: ["USER", "POST", "GROUP"],
-      })) as {
-        data: {
-          search: SearchResults;
-        };
+
+    if (posts) {
+      posts.forEach((post) => {
+        searchResults.push({
+          title: `Post by ${post.postedBy.username}`,
+          content: (
+            <div
+              dangerouslySetInnerHTML={{
+                __html: post.content,
+              }}
+            />
+          ),
+          photo: <></>,
+          createdAt: new Date().toISOString(),
+        });
+      });
+
+      return {
+        hasSearchResults: searchResults.length > 0 || false,
+        searchResults:
+          searchResults.sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          ) || [],
       };
-      setState(res.data.search);
-    } catch (e) {
-      console.error(e);
     }
-  };
+  }, [data]);
 
-  const inputs: FormInput[] = [
-    {
-      name: "search",
-      type: "text",
-      placeholder: "Search...",
-      required: true,
-      label: "Post",
-    },
-  ];
+  const hasSearchResults = useMemo(
+    () => buildSearchResults()?.hasSearchResults,
+    [buildSearchResults]
+  );
+
+  const searchResults = useMemo(
+    () => buildSearchResults()?.searchResults,
+    [buildSearchResults]
+  );
 
   return (
     <DashboardLayout
       PostsComponent={() => (
         <Box>
-          <Box mb={5} borderBottom={1} borderColor="primary.main" pb={5}>
-            <Box
-              borderRadius={2}
-              overflow={"hidden"}
-              mx={3}
-              sx={{
-                backgroundColor: "white",
-              }}
-            >
-              <Box p={2}>
-                <Form
-                  inputs={inputs}
-                  formHook={formHook}
-                  onSubmit={handleSubmit}
-                  submitText="Search"
-                />
-              </Box>
+          <Box
+            borderRadius={2}
+            p={2}
+            mx={3}
+            sx={{
+              backgroundColor: "white",
+            }}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box flex="1 1 auto">
+              <SearchBar />
             </Box>
           </Box>
           <Box px={4} py={2}>
@@ -114,25 +150,31 @@ const SearchPage = () => {
             )}
             {searchLoading ? (
               <CircularProgress variant="indeterminate" color="secondary" />
-            ) : state.posts.length ? (
+            ) : hasSearchResults ? (
               <>
-                <Posts posts={state.posts} commentsToShow={3} />
+                <Box
+                  p={4}
+                  mb={4}
+                  sx={{
+                    backgroundColor: "white",
+                  }}
+                  textAlign={"center"}
+                  borderRadius={3}
+                >
+                  <Typography variant="h6">
+                    Search results for "{params.query}"
+                  </Typography>
+                </Box>
+                {searchResults?.map((result, index) => (
+                  <Box key={index} mb={2}>
+                    <SearchResult {...result} />
+                  </Box>
+                ))}
               </>
             ) : (
-              <Box
-                sx={{
-                  backgroundColor: "white",
-                }}
-                p={4}
-                borderRadius={3}
-                display={"flex"}
-                flexDirection={"column"}
-                alignItems={"center"}
-              >
-                <Typography variant="h4" gutterBottom>
-                  Enter a search term to get started
-                </Typography>
-              </Box>
+              <Typography variant="body1" textAlign="center">
+                No search results found
+              </Typography>
             )}
           </Box>
         </Box>
@@ -142,7 +184,7 @@ const SearchPage = () => {
           {searchLoading ? (
             <CircularProgress variant="indeterminate" color="secondary" />
           ) : (
-            <Trending trendingPosts={trendingPostsData?.trendingPosts} />
+            <Trending trendingPosts={[]} />
           )}
         </Box>
       )}

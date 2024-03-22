@@ -24,7 +24,7 @@ const LoginPage = () => {
   });
   const navigate = useNavigate();
   const [loginUser, { loading }] = useMutation(LOGIN_MUTATION);
-  const { login } = useAuth();
+  const { login, removeToken } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
 
   const handleSubmit = async (data: FormDataType) => {
@@ -33,6 +33,7 @@ const LoginPage = () => {
         alert("Please fill out all fields");
         return;
       }
+      removeToken();
       const res = (await loginUser({
         variables: data,
       })) as {

@@ -44,34 +44,3 @@ export const SEARCH_QUERY = gql`
     }
   }
 `;
-
-export const TRENDING_POSTS = gql`
-  {
-    trendingPosts {
-      id
-      postedBy {
-        id
-        username
-      }
-      content
-      comments {
-        id
-        comment
-        user {
-          id
-          username
-        }
-        createdAt
-      }
-      likes {
-        id
-        username
-      }
-      dislikes {
-        id
-        username
-      }
-      createdAt
-    }
-  }
-`;
