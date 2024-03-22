@@ -36,6 +36,7 @@ export const SEARCH_QUERY = gql`
         firstName
         lastName
         email
+        bio
       }
       groups {
         id

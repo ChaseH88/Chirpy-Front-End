@@ -1,112 +1,74 @@
+import React, { useState, useMemo } from "react";
 import { useQuery } from "@apollo/client";
 import { SEARCH_QUERY } from "../../graphql/queries/search-query";
-import { Posts } from "../../components/Posts/Posts";
 import { DashboardLayout } from "../../components/DashboardLayout";
-import { Box, CircularProgress, Typography } from "@mui/material";
-import { Trending } from "../../components/Trending";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  ButtonGroup,
+  Button,
+} from "@mui/material";
 import { useQueryParams } from "../../hooks/useQueryParams";
 import { SearchBar } from "../../components/SearchBar";
-import { ReactNode, isValidElement, useCallback, useMemo } from "react";
-import { PostModelInterface, UserModelInterface } from "../../types/interfaces";
-import { UserProfilePhoto } from "../../components/UserProfilePhoto";
+import { SearchResult } from "../../components/SearchResult";
+import moment from "moment";
 
-interface SearchResultProps {
-  title: string;
-  content: string | ReactNode;
-  photo: string | ReactNode;
-  createdAt: string;
-}
+const typeArr = ["USER", "POST", "GROUP"] as const;
+const stateArr = [...typeArr, "ALL"] as const;
 
-const SearchResult = ({ title, content, photo }: SearchResultProps) => {
-  return (
-    <Box
-      borderRadius={2}
-      p={2}
-      mx={3}
-      sx={{
-        backgroundColor: "white",
-      }}
-      display="flex"
-      justifyContent="space-between"
-      alignItems="center"
-    >
-      <Box flex="1 1 auto">
-        <Typography variant="h6">{title}</Typography>
-        {isValidElement(content) ? (
-          content
-        ) : (
-          <Typography variant="body1">{content}</Typography>
-        )}
-      </Box>
-      <Box>{photo}</Box>
-    </Box>
-  );
-};
+type State = (typeof stateArr)[number];
 
 const SearchPage = () => {
-  const params = useQueryParams();
+  const { query } = useQueryParams();
 
   const { loading: searchLoading, data } = useQuery(SEARCH_QUERY, {
-    variables: {
-      search: params.query,
-      type: ["USER", "POST", "GROUP"],
-    },
-    skip: !params.query,
+    variables: { search: query, type: typeArr },
+    skip: !query,
   });
 
-  const buildSearchResults = useCallback(() => {
-    const searchResults: SearchResultProps[] = [];
-    const users = data?.search?.users as UserModelInterface[];
-    const posts = data?.search?.posts as PostModelInterface[];
-    // const groups = data?.search?.groups as any[];
+  const [activeFilter, setActiveFilter] = useState<State>("ALL");
 
-    if (users) {
-      users.forEach((user) => {
-        searchResults.push({
-          title: user.username,
-          content: user.email,
-          photo: <UserProfilePhoto src={user.photo} name={user.username} />,
-          createdAt: new Date().toISOString(),
-        });
-      });
+  const searchResults = useMemo(() => {
+    if (!data) return [];
+
+    const { users = [], posts = [] } = data.search;
+    let results = [...users, ...posts];
+
+    if (activeFilter === "USER") {
+      results = users;
+    } else if (activeFilter === "POST") {
+      results = posts;
     }
 
-    if (posts) {
-      posts.forEach((post) => {
-        searchResults.push({
-          title: `Post by ${post.postedBy.username}`,
-          content: (
-            <div
-              dangerouslySetInnerHTML={{
-                __html: post.content,
-              }}
-            />
+    return results
+      .map((item) => ({
+        title: item.username || `Post by ${item.postedBy?.username}`,
+        content:
+          item.bio === null || !item.username ? (
+            <Box>
+              <Typography variant="body1" fontStyle="italic" fontSize={12}>
+                Created {moment(item.createdAt).fromNow()}
+              </Typography>
+              <div dangerouslySetInnerHTML={{ __html: item.content }} />
+            </Box>
+          ) : (
+            <Typography variant="body1" fontStyle="italic">
+              No bio available
+            </Typography>
           ),
-          photo: <></>,
-          createdAt: new Date().toISOString(),
-        });
-      });
+        photo: item.photo || null,
+        createdAt: item.createdAt || new Date().toISOString(),
+      }))
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+  }, [data, activeFilter]);
 
-      return {
-        hasSearchResults: searchResults.length > 0 || false,
-        searchResults:
-          searchResults.sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          ) || [],
-      };
-    }
-  }, [data]);
-
-  const hasSearchResults = useMemo(
-    () => buildSearchResults()?.hasSearchResults,
-    [buildSearchResults]
-  );
-
-  const searchResults = useMemo(
-    () => buildSearchResults()?.searchResults,
-    [buildSearchResults]
-  );
+  const handleFilterChange = (filter: State) => {
+    setActiveFilter(filter);
+  };
 
   return (
     <DashboardLayout
@@ -116,9 +78,7 @@ const SearchPage = () => {
             borderRadius={2}
             p={2}
             mx={3}
-            sx={{
-              backgroundColor: "white",
-            }}
+            sx={{ backgroundColor: "white" }}
             display="flex"
             justifyContent="space-between"
             alignItems="center"
@@ -128,44 +88,63 @@ const SearchPage = () => {
             </Box>
           </Box>
           <Box px={4} py={2}>
-            {searchLoading && (
+            <Box mb={2} display="flex" justifyContent="center">
+              <ButtonGroup
+                variant="contained"
+                aria-label="outlined primary button group"
+              >
+                <Button
+                  onClick={() => handleFilterChange("ALL")}
+                  color={activeFilter === "ALL" ? "secondary" : "primary"}
+                >
+                  All
+                </Button>
+                <Button
+                  onClick={() => handleFilterChange("USER")}
+                  color={activeFilter === "USER" ? "secondary" : "primary"}
+                >
+                  Users
+                </Button>
+                <Button
+                  onClick={() => handleFilterChange("POST")}
+                  color={activeFilter === "POST" ? "secondary" : "primary"}
+                >
+                  Posts
+                </Button>
+              </ButtonGroup>
+            </Box>
+            {searchLoading ? (
               <Box
+                textAlign="center"
                 p={4}
                 mb={4}
-                sx={{
-                  backgroundColor: "white",
-                }}
-                textAlign={"center"}
+                sx={{ backgroundColor: "white" }}
                 borderRadius={3}
               >
                 <Typography
                   variant="body1"
                   gutterBottom
-                  fontStyle={"italic"}
+                  fontStyle="italic"
                   fontWeight={700}
                 >
                   Searching...
                 </Typography>
+                <CircularProgress variant="indeterminate" color="secondary" />
               </Box>
-            )}
-            {searchLoading ? (
-              <CircularProgress variant="indeterminate" color="secondary" />
-            ) : hasSearchResults ? (
+            ) : searchResults.length > 0 ? (
               <>
                 <Box
                   p={4}
                   mb={4}
-                  sx={{
-                    backgroundColor: "white",
-                  }}
-                  textAlign={"center"}
+                  sx={{ backgroundColor: "white" }}
+                  textAlign="center"
                   borderRadius={3}
                 >
                   <Typography variant="h6">
-                    Search results for "{params.query}"
+                    Found {searchResults.length} results for "{query}"
                   </Typography>
                 </Box>
-                {searchResults?.map((result, index) => (
+                {searchResults.map((result, index) => (
                   <Box key={index} mb={2}>
                     <SearchResult {...result} />
                   </Box>
@@ -173,19 +152,10 @@ const SearchPage = () => {
               </>
             ) : (
               <Typography variant="body1" textAlign="center">
-                No search results found
+                No search results found for "{query}"
               </Typography>
             )}
           </Box>
-        </Box>
-      )}
-      TrendingComponent={() => (
-        <Box mx={2}>
-          {searchLoading ? (
-            <CircularProgress variant="indeterminate" color="secondary" />
-          ) : (
-            <Trending trendingPosts={[]} />
-          )}
         </Box>
       )}
     />
