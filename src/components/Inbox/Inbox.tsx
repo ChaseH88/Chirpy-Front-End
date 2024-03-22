@@ -67,12 +67,12 @@ export const Inbox = ({ messages }: InboxProps): JSX.Element => {
     if (fromUser) {
       setExpandedItem(fromUser);
 
-      const unreadMessages = messages[fromUser].filter(
+      const unreadMessages = messages[fromUser]?.filter(
         (message) => message.fromId.id !== currentUser?.id && !message.hasRead
       );
 
-      if (unreadMessages.length > 0) {
-        await handleReadMessages(unreadMessages.map((message) => message.id));
+      if (unreadMessages?.length > 0) {
+        await handleReadMessages(unreadMessages?.map((message) => message.id));
       }
     }
   }, [messages, handleReadMessages, currentUser]);

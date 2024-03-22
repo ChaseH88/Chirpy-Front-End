@@ -2,7 +2,6 @@ import {
   ApolloProvider as ApolloProviderDep,
   ApolloClient,
   InMemoryCache,
-  HttpLink,
   from,
   ApolloLink,
   split,

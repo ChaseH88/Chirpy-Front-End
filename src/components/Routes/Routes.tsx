@@ -6,6 +6,7 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { useAuth } from "../../hooks/useAuth";
 import { EditUserPage } from "../../pages/EditUserPage";
 import { FindPostPage } from "../../pages/FindPostPage";
+import { SearchPage } from "../../pages/SearchPage";
 import { MessagesPage } from "../../pages/MessagesPage";
 import { ProfilePage } from "../../pages/ProfilePage";
 
@@ -44,6 +45,14 @@ const Routes = (): JSX.Element => {
         element={
           <ProtectedRoute>
             <EditUserPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/search"
+        element={
+          <ProtectedRoute>
+            <SearchPage />
           </ProtectedRoute>
         }
       />

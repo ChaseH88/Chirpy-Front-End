@@ -12,6 +12,7 @@ import { Editor } from "../../components/Editor";
 import { GET_DASHBOARD_POSTS } from "../../graphql/queries/get-dashboard-posts";
 import { CREATE_POST_MUTATION } from "../../graphql/mutations/create-post";
 import { CURRENT_USER_QUERY } from "../../graphql/queries/current-user";
+import { SearchBar } from "../../components/SearchBar";
 
 export const POST_LIMIT = 20;
 
@@ -187,16 +188,18 @@ const DashboardPage = () => {
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <Typography variant="h5" gutterBottom>
-                  Dashboard
-                </Typography>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setShowNewPostComponent(true)}
-                >
-                  Create new post
-                </Button>
+                <Box flex="1 1 auto">
+                  <SearchBar />
+                </Box>
+                <Box flex="0 0 200px" textAlign="right">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setShowNewPostComponent(true)}
+                  >
+                    Create new post
+                  </Button>
+                </Box>
               </Box>
             )}
           </Box>

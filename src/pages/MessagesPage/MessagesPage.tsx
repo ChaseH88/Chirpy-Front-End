@@ -187,7 +187,9 @@ const MessagesPage = () => {
                           a.username.localeCompare(b.username)
                         )
                         ?.map((user: any) => (
-                          <MenuItem value={user.id}>{user.username}</MenuItem>
+                          <MenuItem key={user.id} value={user.id}>
+                            {user.username}
+                          </MenuItem>
                         ))}
                     </Select>
                   </Box>

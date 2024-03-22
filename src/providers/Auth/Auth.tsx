@@ -7,6 +7,7 @@ export interface AuthContext {
   login: (token: string) => void;
   logout: () => void;
   getToken: () => string | null;
+  removeToken: () => void;
 }
 
 export const StateContext = React.createContext<AuthContext | undefined>(
@@ -60,6 +61,7 @@ const AuthProvider = ({
         login,
         logout,
         getToken,
+        removeToken,
       }}
     >
       {children}
