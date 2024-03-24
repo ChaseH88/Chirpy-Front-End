@@ -98,6 +98,16 @@ export const Post = ({
                 variables: {
                   id,
                 },
+                updateQueries: {
+                  Search: (prev) => ({
+                    search: {
+                      ...prev.search,
+                      posts: prev.search.posts.filter(
+                        (post: PostModelInterface) => post.id !== id
+                      ),
+                    },
+                  }),
+                },
               });
               onDeletePost?.();
               enqueueSnackbar(res.data.deletePost, {
