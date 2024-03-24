@@ -12,7 +12,7 @@ import {
 import { useQueryParams } from "../../hooks/useQueryParams";
 import { SearchBar } from "../../components/SearchBar";
 import { SearchResult } from "../../components/SearchResult";
-import moment from "moment";
+import { Post } from "../../components/Posts/Post";
 
 const typeArr = ["USER", "POST", "GROUP"] as const;
 const stateArr = [...typeArr, "ALL"] as const;
@@ -32,38 +32,50 @@ const SearchPage = () => {
   const searchResults = useMemo(() => {
     if (!data) return [];
 
-    const { users = [], posts = [] } = data.search;
-    let results = [...users, ...posts];
+    const searchResults: any[] = [];
 
-    if (activeFilter === "USER") {
-      results = users;
-    } else if (activeFilter === "POST") {
-      results = posts;
+    if (
+      data.search.posts &&
+      (activeFilter === "ALL" || activeFilter === "POST")
+    ) {
+      data.search.posts.forEach((post: any) => {
+        searchResults.push({
+          component: <Post post={post} commentsToShow={0} />,
+          createdAt: post.createdAt,
+        });
+      });
     }
 
-    return results
-      .map((item) => ({
-        title: item.username || `Post by ${item.postedBy?.username}`,
-        content:
-          item.bio === null || !item.username ? (
-            <Box>
-              <Typography variant="body1" fontStyle="italic" fontSize={12}>
-                Created {moment(item.createdAt).fromNow()}
-              </Typography>
-              <div dangerouslySetInnerHTML={{ __html: item.content }} />
-            </Box>
-          ) : (
-            <Typography variant="body1" fontStyle="italic">
-              No bio available
-            </Typography>
+    if (
+      data.search.users &&
+      (activeFilter === "ALL" || activeFilter === "USER")
+    ) {
+      data.search.users.forEach((user: any) => {
+        searchResults.push({
+          component: (
+            <SearchResult
+              key={user.id}
+              content={
+                <Box>
+                  <Typography variant="body1" mt={1}>
+                    {user.bio || "No bio available"}
+                  </Typography>
+                </Box>
+              }
+              title={user.username}
+              photo={user.photo}
+              createdAt={user.createdAt}
+            />
           ),
-        photo: item.photo || null,
-        createdAt: item.createdAt || new Date().toISOString(),
-      }))
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+          createdAt: user.createdAt,
+        });
+      });
+    }
+
+    return searchResults.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
   }, [data, activeFilter]);
 
   const handleFilterChange = (filter: State) => {
@@ -146,7 +158,7 @@ const SearchPage = () => {
                 </Box>
                 {searchResults.map((result, index) => (
                   <Box key={index} mb={2}>
-                    <SearchResult {...result} />
+                    {result.component}
                   </Box>
                 ))}
               </>

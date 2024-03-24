@@ -13,7 +13,6 @@ const SearchResult = ({ title, content, photo }: SearchResultProps) => {
     <Box
       borderRadius={2}
       p={2}
-      mx={3}
       sx={{
         backgroundColor: "white",
       }}
